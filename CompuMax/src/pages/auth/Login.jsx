@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../../assets/css/Login.module.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthBrand from '../../components/AuthBrand'
+
 
 function Login() {
     const [message, setMessage] = useState("");
@@ -27,27 +28,31 @@ function Login() {
                 },
                 body: JSON.stringify({ email, password })
             });
-            const data = await res.json();
 
-            if(res.status == 200){
-                setMessageType("success");
-                setMessage(data.message || "Se inicio sesion correctamente correctamente");
+            const result = await res.json();
 
-                setTimeout(()=>{
-                    naviGate("/admin/turnos");
-                }, "1500")
+            if (res.status === 200) {
+                setMsg(result.message);
+                setMsgType("success");
+
+                localStorage.setItem("token", result.token);
+                localStorage.setItem("userType", result.user.type);
                 
-            }
-            if(res.status == 401){
-                setMessageType("error");
-                setMessage(data.error || "El email o la contraseña son incorrectos");
-            }
+                setTimeout(() => {
+                    if (result.user.type === 0) navigate("/admin");
+                    if (result.user.type === 1) navigate("/user");
+                }, 800);
 
+            } else {
+                setMsg(result.error);
+                setMsgType("error");
+            }
 
         } catch (error) {
-            console.log("Error en el login: ", error)
+            setMsg("Error en el servidor.");
+            setMsgType("error");
         }
-    }
+    };
 
     return (
         <div style={{
@@ -65,27 +70,25 @@ function Login() {
                 {/* Panel derecho */}
                 <div className={styles.authForm}>
                     <h2 className={styles.formTitle}>Bienvenido de vuelta</h2>
+                    {msg && (
+                        <div 
+                            style={{
+                                width: "100%",
+                                padding: "10px",
+                                marginBottom: "15px",
+                                borderRadius: "8px",
+                                textAlign: "center",
+                                fontWeight: "600",
+                                background: msgType === "error" ? "#ffb4b4" : "#b4ffd0",
+                                color: msgType === "error" ? "#a70000" : "#006b2a"
+                            }}
+                        >
+                            {msg}
+                        </div>
+                    )}
                     <p className={styles.formSubtitle}>
                         Ingresa tus datos para acceder a tu cuenta
                     </p>
-
-                    {/* ---------- Mensaje ----------- */}
-                    {message && (
-                        <div
-                            style={{
-                                backgroundColor: messageType === "success" ? "#4caf50" : "#f44336",
-                                color: "white",
-                                padding: "10px",
-                                borderRadius: "6px",
-                                marginBottom: "15px",
-                                textAlign: "center",
-                                fontWeight: "bold"
-                            }}
-                        >
-                            {message}
-                        </div>
-                    )}
-
                     <form onSubmit={handleLogin}>
                         <div className={styles.formGroup}>
                             <label className={styles.formLabel} htmlFor="email">

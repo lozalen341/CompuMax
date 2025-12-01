@@ -10,6 +10,7 @@ import Register from '../pages/auth/Register';
 import AdminLayout from '../pages/layouts/AdminLayout';
 
 // Secciones admin
+import Dashboard from '../pages/admin/dashboard';
 import GestionTurnos from '../pages/admin/GestionTurnos';
 import GestionUsuarios from '../pages/admin/GestionUsuarios';
 
@@ -25,14 +26,15 @@ export default function AppRouter() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
 
-                {/* Admin con layout */}
+                {/* Admin */}
                 <Route path="/admin" element={<AdminLayout />}>
+                    {/* dashboard */}
+                    <Route index element={<Dashboard />} />
 
-                    {/* Dashboard: gestión de turnos */}
-                    <Route index element={<GestionTurnos />} />
+                    {/* gestion de turnos */}
                     <Route path="turnos" element={<GestionTurnos />} />
 
-                    {/* Gestión de usuarios */}
+                    {/* gestion de usuarios */}
                     <Route path="usuarios" element={<GestionUsuarios />} />
                     
                 </Route>

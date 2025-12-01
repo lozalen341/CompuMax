@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import AuthBrand from '../../components/AuthBrand';
 
 function Register() {
-    const [message, setMessage] = useState("");
-    const [messageType, setMessageType] = useState("");
+    const [msg, setMsg] = useState("");
+    const [msgType, setMsgType] = useState("");
 
     const [name, setName] = useState("");
     const [lastname, setLastname] = useState("");
@@ -28,24 +28,24 @@ function Register() {
             });
             const data = await res.json();
 
-            //usuario creado
-            if (res.status == 201) {
-                setMessageType("success");
-                setMessage(data.message || "Usuario registrado correctamente")
+            const result = await res.json();
+
+            if (!res.ok) {
+                setMsg(result.error || "Error al registrar");
+                setMsgType("error");
+                return;
             }
 
-            //email ya registrado
-            if (res.status == 409) {
-                setMessageType("error");
-                setMessage(data.error || "El email ya esta registrado");
-            }
+            setMsg("Usuario creado correctamente");
+            setMsgType("success");
 
             if (res.status == 400 || res.status == 401 || res.status == 500) {
                 setMessageType("error");
                 setMessage(data.error || "Error en el registro");
             }
         } catch (error) {
-            console.log("Error en el registro: ", error);
+            setMsg("Error en el servidor");
+            setMsgType("error");
         }
     };
 
@@ -62,24 +62,22 @@ function Register() {
                 <div className={styles.authForm}>
                     <h2 className={styles.formTitle}>Crear cuenta</h2>
                     <p className={styles.formSubtitle}>Completa tus datos para comenzar</p>
-
-                    {/* ---------- Mensaje ----------- */}
-                    {message && (
+                    {msg && (
                         <div
                             style={{
-                                backgroundColor: messageType === "success" ? "#4caf50" : "#f44336",
-                                color: "white",
+                                width: "100%",
                                 padding: "10px",
-                                borderRadius: "6px",
                                 marginBottom: "15px",
+                                borderRadius: "8px",
                                 textAlign: "center",
-                                fontWeight: "bold"
+                                fontWeight: "600",
+                                background: msgType === "error" ? "#ffb4b4" : "#b4ffd0",
+                                color: msgType === "error" ? "#a70000" : "#006b2a"
                             }}
                         >
-                            {message}
+                            {msg}
                         </div>
                     )}
-
                     <form onSubmit={handleRegister}>
                         <div className={styles.formRow}>
                             <div className={styles.formGroup}>

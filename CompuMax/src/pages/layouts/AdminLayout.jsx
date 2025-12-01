@@ -1,5 +1,4 @@
-// src/pages/layouts/AdminLayout.jsx
-import "../../assets/css/Global.css"; // CSS global (layout)
+import "../../assets/css/Global.css";
 import SideBar from "../../components/SideBarAdmin";
 import { Outlet } from "react-router-dom";
 
@@ -8,7 +7,7 @@ function AdminLayout() {
         <div className="adminLayout">
             <SideBar />
             <div className="adminContent">
-                <Outlet /> {/* Aquí se cargan las secciones */}
+                <Outlet />
             </div>
         </div>
     );
