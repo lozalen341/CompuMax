@@ -1,11 +1,18 @@
 import React, { useState } from "react";
 import styles from "../../assets/css/Login.module.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthBrand from '../../components/AuthBrand'
 
+
 function Login() {
+    const navigate = useNavigate();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    const [msg, setMsg] = useState("");
+    const [msgType, setMsgType] = useState("");
+
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -21,12 +28,31 @@ function Login() {
                 },
                 body: JSON.stringify({ email, password })
             });
+
             const result = await res.json();
-            console.log(result);
+
+            if (res.status === 200) {
+                setMsg(result.message);
+                setMsgType("success");
+
+                localStorage.setItem("token", result.token);
+                localStorage.setItem("userType", result.user.type);
+                
+                setTimeout(() => {
+                    if (result.user.type === 0) navigate("/admin");
+                    if (result.user.type === 1) navigate("/user");
+                }, 800);
+
+            } else {
+                setMsg(result.error);
+                setMsgType("error");
+            }
+
         } catch (error) {
-            console.log("Error en el login: ", error)
+            setMsg("Error en el servidor.");
+            setMsgType("error");
         }
-    }
+    };
 
     return (
         <div style={{
@@ -44,10 +70,25 @@ function Login() {
                 {/* Panel derecho */}
                 <div className={styles.authForm}>
                     <h2 className={styles.formTitle}>Bienvenido de vuelta</h2>
+                    {msg && (
+                        <div 
+                            style={{
+                                width: "100%",
+                                padding: "10px",
+                                marginBottom: "15px",
+                                borderRadius: "8px",
+                                textAlign: "center",
+                                fontWeight: "600",
+                                background: msgType === "error" ? "#ffb4b4" : "#b4ffd0",
+                                color: msgType === "error" ? "#a70000" : "#006b2a"
+                            }}
+                        >
+                            {msg}
+                        </div>
+                    )}
                     <p className={styles.formSubtitle}>
                         Ingresa tus datos para acceder a tu cuenta
                     </p>
-
                     <form onSubmit={handleLogin}>
                         <div className={styles.formGroup}>
                             <label className={styles.formLabel} htmlFor="email">
@@ -79,9 +120,7 @@ function Login() {
                             />
                         </div>
 
-                        <button type="submit">
-                            Iniciar Sesión
-                        </button>
+                        <button type="submit" className="btn-primary">Iniciar Sesión</button>
 
                         <div className={styles.formFooter}>
                             ¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link>

@@ -4,6 +4,9 @@ import { Link } from "react-router-dom";
 import AuthBrand from '../../components/AuthBrand';
 
 function Register() {
+    const [msg, setMsg] = useState("");
+    const [msgType, setMsgType] = useState("");
+
     const [name, setName] = useState("");
     const [lastname, setLastname] = useState("");
     const [email, setEmail] = useState("");
@@ -24,16 +27,20 @@ function Register() {
                 body: JSON.stringify({ name, lastname, email, password, type })
             });
 
+            const result = await res.json();
+
             if (!res.ok) {
-                const text = await res.text(); // recibís el HTML de error
-                throw new Error(`Error ${res.status}: ${text}`);
+                setMsg(result.error || "Error al registrar");
+                setMsgType("error");
+                return;
             }
 
-            const result = await res.json();
-            console.log(result);
+            setMsg("Usuario creado correctamente");
+            setMsgType("success");
 
         } catch (error) {
-            console.log("Error en el registro: ", error);
+            setMsg("Error en el servidor");
+            setMsgType("error");
         }
     };
 
@@ -50,7 +57,22 @@ function Register() {
                 <div className={styles.authForm}>
                     <h2 className={styles.formTitle}>Crear cuenta</h2>
                     <p className={styles.formSubtitle}>Completa tus datos para comenzar</p>
-
+                    {msg && (
+                        <div
+                            style={{
+                                width: "100%",
+                                padding: "10px",
+                                marginBottom: "15px",
+                                borderRadius: "8px",
+                                textAlign: "center",
+                                fontWeight: "600",
+                                background: msgType === "error" ? "#ffb4b4" : "#b4ffd0",
+                                color: msgType === "error" ? "#a70000" : "#006b2a"
+                            }}
+                        >
+                            {msg}
+                        </div>
+                    )}
                     <form onSubmit={handleRegister}>
                         <div className={styles.formRow}>
                             <div className={styles.formGroup}>

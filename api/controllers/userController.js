@@ -22,20 +22,20 @@ exports.createUser = async (req, res) => {
     try {
         let { name, lastname, email, type, password } = req.body;
 
-        // Convertir el tipo de usuario a formato numérico
-        if (type === "user") {
-            type = 1;
-        } else if (type === "admin") {
-            type = 0;
-        } else {
-            return res.status(400).json({ error: "El tipo de usuario no es válido" });
+        if (type === "user") type = 1;
+        else if (type === "admin") type = 0;
+        else return res.status(400).json({ error: "El tipo de usuario no es válido" });
+
+        // verificar si ya existe el mail
+        const existingUser = await Users.getByEmail(email);
+        if (existingUser) {
+            return res.status(400).json({ error: "El email ya está registrado" });
         }
 
-        // Encriptar la contraseña
+        // encriptar la contraseña
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // Crear usuario en la base de datos
         const create = await Users.createUser(
             name,
             lastname,
@@ -49,6 +49,7 @@ exports.createUser = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
 
 /**
  * Obtiene todos los usuarios del sistema
@@ -212,7 +213,7 @@ exports.login = async (req, res) => {
 
         // Validar que se enviaron email y contraseña
         if (!email || !password) {
-            return res.status(400).json({ error: "Es necesario el email y la contraseña" });
+            return res.status(401).json({ error: "Es necesario el email y la contraseña" });
         }
 
         // Buscar usuario por email
