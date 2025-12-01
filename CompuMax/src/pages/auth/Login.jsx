@@ -1,18 +1,18 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "../../assets/css/Login.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import AuthBrand from '../../components/AuthBrand'
 
 
 function Login() {
-    const navigate = useNavigate();
+    const [message, setMessage] = useState("");
+    const [messageType, setMessageType] = useState("");
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const [msg, setMsg] = useState("");
-    const [msgType, setMsgType] = useState("");
-
+    const naviGate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();

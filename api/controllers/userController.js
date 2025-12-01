@@ -44,9 +44,16 @@ exports.createUser = async (req, res) => {
             hashedPassword
         );
 
-        res.json({ ok: true, user: create });
+        return res.status(201).json({
+            ok: true,
+            message: "Usuario creado correctamente",
+            user: create
+        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.log("Error en createUser:", error);
+        return res.status(500).json({
+            error: "Error interno del servidor"
+        });
     }
 };
 
@@ -238,7 +245,7 @@ exports.login = async (req, res) => {
         );
 
         res.json({ 
-            message: "Login exitoso", 
+            message: "Se inicio sesion correctamente correctamente", 
             token, 
             user: { id: user.id_user, email: user.email, type: user.type }
         });

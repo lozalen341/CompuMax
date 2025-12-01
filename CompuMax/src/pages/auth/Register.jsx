@@ -11,7 +11,7 @@ function Register() {
     const [lastname, setLastname] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [type, setType] = useState("user"); // default user
+    const [type] = useState("user"); // default user
 
     const handleRegister = async (e) => {
         e.preventDefault();
@@ -26,6 +26,7 @@ function Register() {
                 },
                 body: JSON.stringify({ name, lastname, email, password, type })
             });
+            const data = await res.json();
 
             const result = await res.json();
 
@@ -38,6 +39,10 @@ function Register() {
             setMsg("Usuario creado correctamente");
             setMsgType("success");
 
+            if (res.status == 400 || res.status == 401 || res.status == 500) {
+                setMessageType("error");
+                setMessage(data.error || "Error en el registro");
+            }
         } catch (error) {
             setMsg("Error en el servidor");
             setMsgType("error");
@@ -127,19 +132,6 @@ function Register() {
                                 required
                             />
                             <p className={styles.formHelper}>Mínimo 8 caracteres</p>
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label className={styles.formLabel} htmlFor="type">Tipo de usuario</label>
-                            <select
-                                id="type"
-                                className={styles.formInput}
-                                value={type}
-                                onChange={(e) => setType(e.target.value)}
-                            >
-                                <option value="user">Usuario</option>
-                                <option value="admin">Administrador</option>
-                            </select>
                         </div>
 
                         <button type="submit" className="btn-primary">Crear Cuenta</button>
