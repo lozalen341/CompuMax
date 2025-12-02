@@ -1,0 +1,338 @@
+/* NuevoTurno.module.css */
+
+.mainContent {
+    padding: 2rem;
+    overflow-y: auto;
+    background: linear-gradient(135deg, #f5f7fa 0%, #E8F0F2 100%);
+    min-height: 100vh;
+}
+
+/* ========== HEADER ========== */
+.contentHeader {
+    background: linear-gradient(135deg, #4A9B8E 0%, #2C7A6F 100%);
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    color: white;
+}
+
+.headerLeft {
+    flex: 1;
+}
+
+.pageTitle {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.pageSubtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* ========== FORM CONTAINER ========== */
+.formContainer {
+    display: grid;
+    gap: 2rem;
+}
+
+/* ========== SERVICIOS SECTION ========== */
+.serviciosSection {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.sectionTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.serviciosGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.servicioCard {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+.servicioCard:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    border-color: #4A9B8E;
+    background: white;
+}
+
+.servicioIcon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #4A9B8E 0%, #2C7A6F 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 1rem;
+    box-shadow: 0 4px 12px rgba(74, 155, 142, 0.3);
+}
+
+.servicioTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 0.5rem 0;
+}
+
+.servicioDescription {
+    font-size: 0.9rem;
+    color: #718096;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ========== FORM SECTION ========== */
+.formSection {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formLabel {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a202c;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.formInput,
+.formSelect,
+.formTextarea {
+    padding: 0.875rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.formInput:focus,
+.formSelect:focus,
+.formTextarea:focus {
+    border-color: #4A9B8E;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 155, 142, 0.1);
+}
+
+.formTextarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.formHint {
+    font-size: 0.85rem;
+    color: #718096;
+    font-style: italic;
+}
+
+.formRow {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+/* ========== INFO BOX ========== */
+.infoBox {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-left: 4px solid #3B82F6;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.infoIcon {
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.infoContent {
+    flex: 1;
+}
+
+.infoTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 0.75rem 0;
+}
+
+.infoList {
+    margin: 0;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.infoList li {
+    font-size: 0.9rem;
+    color: #4a5568;
+    line-height: 1.5;
+}
+
+/* ========== FORM ACTIONS ========== */
+.formActions {
+    display: flex;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid #f0f0f0;
+}
+
+.btnPrimary,
+.btnSecondary {
+    flex: 1;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btnPrimary {
+    background: linear-gradient(135deg, #4A9B8E 0%, #2C7A6F 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(74, 155, 142, 0.3);
+}
+
+.btnPrimary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(74, 155, 142, 0.4);
+}
+
+.btnSecondary {
+    background: white;
+    color: #4a5568;
+    border: 2px solid #e2e8f0;
+}
+
+.btnSecondary:hover {
+    background: #f8f9fa;
+    border-color: #cbd5e0;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1024px) {
+    .serviciosGrid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .mainContent {
+        padding: 1rem;
+    }
+
+    .contentHeader {
+        padding: 1.5rem;
+    }
+
+    .pageTitle {
+        font-size: 1.8rem;
+    }
+
+    .serviciosSection,
+    .formSection {
+        padding: 1.5rem;
+    }
+
+    .serviciosGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .formRow {
+        grid-template-columns: 1fr;
+    }
+
+    .formActions {
+        flex-direction: column-reverse;
+    }
+
+    .btnPrimary,
+    .btnSecondary {
+        width: 100%;
+    }
+
+    .infoBox {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .infoIcon {
+        margin: 0 auto;
+    }
+
+    .infoList {
+        padding-left: 0;
+        list-style: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .servicioCard {
+        padding: 1.25rem;
+    }
+
+    .servicioIcon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.75rem;
+    }
+}

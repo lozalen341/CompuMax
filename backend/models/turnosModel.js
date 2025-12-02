@@ -29,29 +29,16 @@ exports.updateTurno = async (id, datos) => {
     const campos = [];
     const params = [];
 
-    if (datos.id_user != undefined && datos.id_user != null) {
-        campos.push("id_user=?");
-        params.push(datos.id_user);
+    const array = ["id_user", "dateCreated", "deliveryTime", "status", "description"];
+
+    for (let i = 0; i < array.length; i++) {
+        const element = array[i];
+        if (datos[element] !== undefined && datos[element] !== null) {
+            campos.push(`${element}=?`);
+            params.push(datos[element]);
+        }
     }
 
-    if (datos.dateCreated != undefined && datos.dateCreated != null) {
-        campos.push("dateCreated=?");
-        params.push(datos.dateCreated);
-    }
-    if (datos.deliveryTime != undefined && datos.deliveryTime != null) {
-        campos.push("deliveryTime=?");
-        params.push(datos.deliveryTime);
-    }
-
-    if (datos.status != undefined && datos.status != null) {
-        campos.push("status=?");
-        params.push(datos.status);
-    }
-
-    if (datos.description != undefined && datos.description != null) {
-        campos.push("description=?");
-        params.push(datos.description);
-    }
 
     const sql = `UPDATE tickets SET ${campos.join(", ")} WHERE id_ticket = ?`;
     params.push(id);

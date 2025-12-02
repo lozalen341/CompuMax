@@ -1,18 +1,17 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import styles from "../../assets/css/Login.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import AuthBrand from '../../components/AuthBrand'
 
 
 function Login() {
-    const [message, setMessage] = useState("");
-    const [messageType, setMessageType] = useState("");
+    const [msg, setMsg] = useState("");
+    const [msgType, setMsgType] = useState("");
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const naviGate = useNavigate();
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -30,6 +29,7 @@ function Login() {
             });
 
             const result = await res.json();
+            console.log(result);
 
             if (res.status === 200) {
                 setMsg(result.message);
@@ -41,7 +41,7 @@ function Login() {
                 setTimeout(() => {
                     if (result.user.type === 0) navigate("/admin");
                     if (result.user.type === 1) navigate("/user");
-                }, 800);
+                }, 700);
 
             } else {
                 setMsg(result.error);
@@ -51,6 +51,7 @@ function Login() {
         } catch (error) {
             setMsg("Error en el servidor.");
             setMsgType("error");
+            console.error("Error:", error);
         }
     };
 
