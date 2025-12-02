@@ -1,5 +1,5 @@
 import AppRouter from "./routes/appRoutes"
-import "./assets/css/global.css";
+import "./assets/css/Global.css";
 
 function App() {
     return (
