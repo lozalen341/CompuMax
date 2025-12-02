@@ -1,7 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "../../assets/css/NuevoTurno.module.css";
 
 function NuevoTurno() {
+    const navigate = useNavigate();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [message, setMessage] = useState({ text: "", type: "" });
+    
     const [formData, setFormData] = useState({
         servicio: "",
         descripcion: "",
@@ -16,10 +21,66 @@ function NuevoTurno() {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Datos del turno:", formData);
-        // Aquí irá la lógica para enviar al backend
+        setIsSubmitting(true);
+        setMessage({ text: "", type: "" });
+
+        try {
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('userId');
+            
+            if (!token || !userId) {
+                throw new Error('No se encontró la información de autenticación');
+            }
+
+            // Formatear fechas según lo esperado por el backend
+            const dateCreated = new Date().toISOString();
+            const deliveryDateTime = new Date(`${formData.fecha}T${formData.hora}:00`).toISOString();
+
+            const API_KEY = import.meta.env.VITE_API_KEY;
+            const response = await fetch('http://localhost:3000/turnos/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': API_KEY,
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    id_user: parseInt(userId),
+                    dateCreated: dateCreated,
+                    deliveryTime: deliveryDateTime,
+                    status: "pendiente",
+                    description: `${formData.servicio}: ${formData.descripcion}`
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Error al crear el turno');
+            }
+
+            // Mostrar mensaje de éxito
+            setMessage({
+                text: '¡Turno creado exitosamente! Redirigiendo...',
+                type: 'success'
+            });
+
+            // Redirigir después de 2 segundos
+            setTimeout(() => {
+                navigate('/user/mis-turnos');
+            }, 2000);
+
+        } catch (error) {
+            console.error('Error al crear el turno:', error);
+            setMessage({
+                text: error.message || 'Error al procesar la solicitud',
+                type: 'error'
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -171,13 +232,20 @@ function NuevoTurno() {
                             </div>
                         </div>
 
+                        {message.text && (
+        <div className={`${styles.message} ${message.type === 'error' ? styles.error : styles.success}`}>
+            {message.text}
+        </div>
+    )}
+
                         {/* Buttons */}
                         <div className={styles.formActions}>
-                            <button type="button" className={styles.btnSecondary}>
-                                ← Cancelar
-                            </button>
-                            <button type="submit" className={styles.btnPrimary}>
-                                ✓ Solicitar Turno
+                            <button 
+                                type="submit" 
+                                className={styles.btnPrimary}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? 'Procesando...' : '✓ Solicitar Turno'}
                             </button>
                         </div>
                     </form>
