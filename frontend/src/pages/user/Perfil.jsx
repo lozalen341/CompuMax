@@ -1,16 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "../../assets/css/MiPerfil.module.css";
 
+const API_URL = "http://localhost:3000"; // Ajusta según tu configuración
+
 function MiPerfil() {
+    const id = localStorage.getItem('userId');
     const [activeTab, setActiveTab] = useState("datos");
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
     
-    // Datos de ejemplo - reemplazar con datos reales del usuario
     const [userData, setUserData] = useState({
-        nombre: "Juan",
-        apellido: "Pérez",
-        email: "juan.perez@ejemplo.com",
-        telefono: "+54 11 1234-5678",
-        direccion: "Av. Ejemplo 123, CABA"
+        name: "",
+        lastname: "",
+        email: "",
+        phone: "",
+        address: "",
+        tickets: 0,
+        ticketsPending: 0
     });
 
     const [passwordData, setPasswordData] = useState({
@@ -18,6 +24,52 @@ function MiPerfil() {
         newPassword: "",
         confirmPassword: ""
     });
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const API_KEY = import.meta.env.VITE_API_KEY
+                const res = await fetch(`${API_URL}/user/getById/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-api-key": API_KEY
+                    }
+                });
+
+                const tickets = await fetch(`${API_URL}/turnos/getById/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "x-api-key": API_KEY
+                    }
+                });
+
+                const ticketData = await tickets.json();
+
+                const data = await res.json();
+                
+                if (data.ok) {
+                    setUserData({
+                        name: data.user[0].name || "",
+                        lastname: data.user[0].lastname || "",
+                        email: data.user[0].email || "",
+                        phone: data.user[0].phone || "",
+                        address: data.user[0].address || "",
+                        tickets: ticketData.user.length,
+                        ticketsPending: ticketData.user.filter(ticket => ticket.status === "pendiente").length
+                    });
+                }
+            } catch (error) {
+                console.error("Error al cargar los datos del usuario:", error);
+                setError("Error al cargar los datos del usuario. Por favor, intente nuevamente.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchUserData();
+    }, [id]);
 
     const handleUserDataChange = (e) => {
         setUserData({
@@ -33,17 +85,109 @@ function MiPerfil() {
         });
     };
 
-    const handleSaveProfile = (e) => {
+    const handleSaveProfile = async (e) => {
         e.preventDefault();
-        console.log("Guardar perfil:", userData);
-        // Aquí irá la lógica para actualizar en el backend
+        try {
+            const API_KEY = import.meta.env.VITE_API_KEY;
+            const token = localStorage.getItem('token');
+            
+            const response = await fetch(`${API_URL}/user/update/${id}`, {
+                method: 'PUT',
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": API_KEY,
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: userData.name,
+                    lastname: userData.lastname,
+                    email: userData.email,
+                    phone: userData.phone,
+                    address: userData.address
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Actualizar los datos locales con la respuesta del servidor
+                setUserData(prev => ({
+                    ...prev,
+                    name: data.user.name || prev.name,
+                    lastname: data.user.lastname || prev.lastname,
+                    email: data.user.email || prev.email,
+                    phone: data.user.phone || prev.phone,
+                    address: data.user.address || prev.address
+                }));
+                
+                // Mostrar mensaje de éxito
+                alert("Perfil actualizado correctamente");
+            } else {
+                // Mostrar mensaje de error
+                throw new Error(data.message || "Error al actualizar el perfil");
+            }
+        } catch (error) {
+            console.error("Error al actualizar el perfil:", error);
+            alert(error.message || "Error al actualizar el perfil. Por favor, intente nuevamente.");
+        }
     };
 
-    const handleChangePassword = (e) => {
+    const handleChangePassword = async (e) => {
         e.preventDefault();
-        console.log("Cambiar contraseña");
-        // Aquí irá la lógica para cambiar contraseña
+        
+        // Validar que las contraseñas coincidan
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            alert("Las contraseñas no coinciden");
+            return;
+        }
+
+        try {
+            const API_KEY = import.meta.env.VITE_API_KEY;
+            const token = localStorage.getItem('token');
+            
+            const response = await fetch(`${API_URL}/user/changePsw/${id}`, {
+                method: 'PUT',
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": API_KEY,
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    currentPassword: passwordData.currentPassword,
+                    newPassword: passwordData.newPassword
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Limpiar el formulario
+                setPasswordData({
+                    currentPassword: "",
+                    newPassword: "",
+                    confirmPassword: ""
+                });
+                
+                // Mostrar mensaje de éxito
+                alert("Contraseña actualizada correctamente");
+            } else {
+                // Mostrar mensaje de error específico si está disponible
+                const errorMessage = data.message || "Error al actualizar la contraseña";
+                throw new Error(errorMessage);
+            }
+        } catch (error) {
+            console.error("Error al cambiar la contraseña:", error);
+            alert(error.message || "Error al cambiar la contraseña. Por favor, intente nuevamente.");
+        }
     };
+
+    if (isLoading) {
+        return <div className={styles.loading}>Cargando datos del perfil...</div>;
+    }
+
+    if (error) {
+        return <div className={styles.error}>{error}</div>;
+    }
 
     return (
         <main className={styles.mainContent}>
@@ -60,20 +204,20 @@ function MiPerfil() {
                 <div className={styles.profileHeader}>
                     <div className={styles.avatarSection}>
                         <div className={styles.avatar}>
-                            {userData.nombre.charAt(0)}{userData.apellido.charAt(0)}
+                            {userData.name.charAt(0)}{userData.lastname.charAt(0)}
                         </div>
                         <div className={styles.avatarInfo}>
-                            <h2 className={styles.userName}>{userData.nombre} {userData.apellido}</h2>
+                            <h2 className={styles.userName}>{userData.name} {userData.lastname}</h2>
                             <p className={styles.userEmail}>{userData.email}</p>
                         </div>
                     </div>
                     <div className={styles.userStats}>
                         <div className={styles.statItem}>
-                            <span className={styles.statValue}>11</span>
+                            <span className={styles.statValue}>{userData.tickets}</span>
                             <span className={styles.statLabel}>Turnos</span>
                         </div>
                         <div className={styles.statItem}>
-                            <span className={styles.statValue}>3</span>
+                            <span className={styles.statValue}>{userData.ticketsPending}</span>
                             <span className={styles.statLabel}>Pendientes</span>
                         </div>
                     </div>
@@ -100,79 +244,66 @@ function MiPerfil() {
                 {/* Tab Content: Datos Personales */}
                 {activeTab === "datos" && (
                     <div className={styles.tabContent}>
-                        <form onSubmit={handleSaveProfile} className={styles.form}>
-                            <div className={styles.formSection}>
-                                <h3 className={styles.formSectionTitle}>Información Personal</h3>
-                                
-                                <div className={styles.formRow}>
-                                    <div className={styles.formGroup}>
-                                        <label className={styles.formLabel}>Nombre *</label>
-                                        <input
-                                            type="text"
-                                            name="nombre"
-                                            className={styles.formInput}
-                                            value={userData.nombre}
-                                            onChange={handleUserDataChange}
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className={styles.formGroup}>
-                                        <label className={styles.formLabel}>Apellido *</label>
-                                        <input
-                                            type="text"
-                                            name="apellido"
-                                            className={styles.formInput}
-                                            value={userData.apellido}
-                                            onChange={handleUserDataChange}
-                                            required
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className={styles.formGroup}>
-                                    <label className={styles.formLabel}>Email *</label>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        className={styles.formInput}
-                                        value={userData.email}
-                                        onChange={handleUserDataChange}
-                                        required
-                                    />
-                                </div>
-
-                                <div className={styles.formGroup}>
-                                    <label className={styles.formLabel}>Teléfono</label>
-                                    <input
-                                        type="tel"
-                                        name="telefono"
-                                        className={styles.formInput}
-                                        value={userData.telefono}
-                                        onChange={handleUserDataChange}
-                                        placeholder="+54 11 1234-5678"
-                                    />
-                                </div>
-
-                                <div className={styles.formGroup}>
-                                    <label className={styles.formLabel}>Dirección</label>
-                                    <input
-                                        type="text"
-                                        name="direccion"
-                                        className={styles.formInput}
-                                        value={userData.direccion}
-                                        onChange={handleUserDataChange}
-                                        placeholder="Calle, número, ciudad"
-                                    />
-                                </div>
+                        <form onSubmit={handleSaveProfile} className={styles.profileForm}>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="name">Nombre</label>
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    value={userData.name}
+                                    onChange={handleUserDataChange}
+                                    className={styles.formControl}
+                                />
                             </div>
-
+                            <div className={styles.formGroup}>
+                                <label htmlFor="lastname">Apellido</label>
+                                <input
+                                    type="text"
+                                    id="lastname"
+                                    name="lastname"
+                                    value={userData.lastname}
+                                    onChange={handleUserDataChange}
+                                    className={styles.formControl}
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="email">Email</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value={userData.email}
+                                    onChange={handleUserDataChange}
+                                    className={styles.formControl}
+                                    disabled
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="phone">Teléfono</label>
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    value={userData.phone}
+                                    onChange={handleUserDataChange}
+                                    className={styles.formControl}
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="address">Dirección</label>
+                                <textarea
+                                    id="address"
+                                    name="address"
+                                    value={userData.address}
+                                    onChange={handleUserDataChange}
+                                    className={styles.formControl}
+                                    rows="3"
+                                ></textarea>
+                            </div>
                             <div className={styles.formActions}>
-                                <button type="button" className={styles.btnSecondary}>
-                                    Cancelar
-                                </button>
                                 <button type="submit" className={styles.btnPrimary}>
-                                    ✓ Guardar Cambios
+                                    Guardar Cambios
                                 </button>
                             </div>
                         </form>
@@ -182,98 +313,49 @@ function MiPerfil() {
                 {/* Tab Content: Seguridad */}
                 {activeTab === "seguridad" && (
                     <div className={styles.tabContent}>
-                        <form onSubmit={handleChangePassword} className={styles.form}>
-                            <div className={styles.formSection}>
-                                <h3 className={styles.formSectionTitle}>Cambiar Contraseña</h3>
-                                
-                                <div className={styles.infoBox}>
-                                    <div className={styles.infoIcon}>🔒</div>
-                                    <div className={styles.infoContent}>
-                                        <h4 className={styles.infoTitle}>Requisitos de Contraseña</h4>
-                                        <ul className={styles.infoList}>
-                                            <li>Mínimo 8 caracteres</li>
-                                            <li>Al menos una letra mayúscula</li>
-                                            <li>Al menos un número</li>
-                                            <li>Al menos un carácter especial (!@#$%)</li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <div className={styles.formGroup}>
-                                    <label className={styles.formLabel}>Contraseña Actual *</label>
-                                    <input
-                                        type="password"
-                                        name="currentPassword"
-                                        className={styles.formInput}
-                                        value={passwordData.currentPassword}
-                                        onChange={handlePasswordChange}
-                                        required
-                                        placeholder="Ingresa tu contraseña actual"
-                                    />
-                                </div>
-
-                                <div className={styles.formGroup}>
-                                    <label className={styles.formLabel}>Nueva Contraseña *</label>
-                                    <input
-                                        type="password"
-                                        name="newPassword"
-                                        className={styles.formInput}
-                                        value={passwordData.newPassword}
-                                        onChange={handlePasswordChange}
-                                        required
-                                        placeholder="Ingresa tu nueva contraseña"
-                                    />
-                                </div>
-
-                                <div className={styles.formGroup}>
-                                    <label className={styles.formLabel}>Confirmar Nueva Contraseña *</label>
-                                    <input
-                                        type="password"
-                                        name="confirmPassword"
-                                        className={styles.formInput}
-                                        value={passwordData.confirmPassword}
-                                        onChange={handlePasswordChange}
-                                        required
-                                        placeholder="Confirma tu nueva contraseña"
-                                    />
-                                </div>
+                        <form onSubmit={handleChangePassword} className={styles.profileForm}>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="currentPassword">Contraseña Actual</label>
+                                <input
+                                    type="password"
+                                    id="currentPassword"
+                                    name="currentPassword"
+                                    value={passwordData.currentPassword}
+                                    onChange={handlePasswordChange}
+                                    className={styles.formControl}
+                                    required
+                                />
                             </div>
-
+                            <div className={styles.formGroup}>
+                                <label htmlFor="newPassword">Nueva Contraseña</label>
+                                <input
+                                    type="password"
+                                    id="newPassword"
+                                    name="newPassword"
+                                    value={passwordData.newPassword}
+                                    onChange={handlePasswordChange}
+                                    className={styles.formControl}
+                                    required
+                                />
+                            </div>
+                            <div className={styles.formGroup}>
+                                <label htmlFor="confirmPassword">Confirmar Nueva Contraseña</label>
+                                <input
+                                    type="password"
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    value={passwordData.confirmPassword}
+                                    onChange={handlePasswordChange}
+                                    className={styles.formControl}
+                                    required
+                                />
+                            </div>
                             <div className={styles.formActions}>
-                                <button type="button" className={styles.btnSecondary}>
-                                    Cancelar
-                                </button>
                                 <button type="submit" className={styles.btnPrimary}>
-                                    🔒 Cambiar Contraseña
+                                    Cambiar Contraseña
                                 </button>
                             </div>
                         </form>
-
-                        {/* Account Actions */}
-                        <div className={styles.dangerZone}>
-                            <h3 className={styles.dangerZoneTitle}>⚠️ Zona de Peligro</h3>
-                            <div className={styles.dangerZoneContent}>
-                                <div className={styles.dangerZoneItem}>
-                                    <div>
-                                        <h4 className={styles.dangerZoneItemTitle}>Desactivar Cuenta</h4>
-                                        <p className={styles.dangerZoneItemDescription}>
-                                            Tu cuenta será desactivada temporalmente. Podrás reactivarla en cualquier momento.
-                                        </p>
-                                    </div>
-                                    <button className={styles.btnWarning}>Desactivar</button>
-                                </div>
-                                
-                                <div className={styles.dangerZoneItem}>
-                                    <div>
-                                        <h4 className={styles.dangerZoneItemTitle}>Eliminar Cuenta</h4>
-                                        <p className={styles.dangerZoneItemDescription}>
-                                            Esta acción es permanente y no se puede deshacer. Todos tus datos serán eliminados.
-                                        </p>
-                                    </div>
-                                    <button className={styles.btnDanger}>Eliminar</button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 )}
             </div>
