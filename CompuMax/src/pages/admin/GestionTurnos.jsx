@@ -48,6 +48,27 @@ function GestionTurnos() {
         }
     };
 
+    const handleEdit = async (e, ) => {
+        e.preventDefault();
+
+        const API_KEY = import.meta.env.VITE_API_KEY;
+
+        try {
+            const res = await fetch(`http://localhost:3000/turnos/delete/${idTicket}`, {
+                method: 'DELETE',
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": API_KEY
+                },
+            });
+
+            const result = await res.json();
+            setUsers(users.filter(t => t.id_ticket !== idTicket));
+
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     const [filtroEstado, setFiltroEstado] = useState("Todos");
     const [filtroServicio, setFiltroServicio] = useState("Todos los servicios");

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import "../assets/css/SideBarAdmin.module.css";
+import "../assets/css/SideBar.css";
 
 function SideBar() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -29,12 +29,21 @@ function SideBar() {
 
                 <nav className="sidebarNav">
                     <NavLink
+                        to="/admin"
+                        className={({ isActive }) => "navItem" + (isActive ? " active" : "")}
+                        onClick={closeSidebar}
+                    >
+                        <span className="navIcon"></span>
+                        <span>Dashboard</span>
+                    </NavLink>
+
+                    <NavLink
                         to="/admin/turnos"
                         end
                         className={({ isActive }) => "navItem" + (isActive ? " active" : "")}
                         onClick={closeSidebar}
                     >
-                        <span className="navIcon">📊</span>
+                        <span className="navIcon"></span>
                         <span>Gestión de Turnos</span>
                     </NavLink>
 
@@ -43,9 +52,25 @@ function SideBar() {
                         className={({ isActive }) => "navItem" + (isActive ? " active" : "")}
                         onClick={closeSidebar}
                     >
-                        <span className="navIcon">👥</span>
+                        <span className="navIcon"></span>
                         <span>Gestión de Usuarios</span>
                     </NavLink>
+
+                    {/* Otros enlaces comentados */}
+                    {/* <NavLink to="/servicios" className="navItem" onClick={closeSidebar}>
+                        <span className="navIcon">🔧</span>
+                        <span>Servicios</span>
+                    </NavLink>
+
+                    <NavLink to="/reportes" className="navItem" onClick={closeSidebar}>
+                        <span className="navIcon">📈</span>
+                        <span>Reportes</span>
+                    </NavLink>
+
+                    <NavLink to="/configuracion" className="navItem" onClick={closeSidebar}>
+                        <span className="navIcon">⚙️</span>
+                        <span>Configuración</span>
+                    </NavLink> */}
                 </nav>
 
                 <div className="sidebarFooter">

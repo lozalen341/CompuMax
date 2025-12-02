@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import "../assets/css/SideBarUser.module.css";
+import "../assets/css/SideBar.css";
 
-function SideBarUser() {
+function SideBar() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
@@ -29,7 +29,7 @@ function SideBarUser() {
 
                 <nav className="sidebarNav">
                     <NavLink
-                        to="/user/dashboard"
+                        to="/user"
                         className={({ isActive }) => "navItem" + (isActive ? " active" : "")}
                         onClick={closeSidebar}
                     >
@@ -56,7 +56,7 @@ function SideBarUser() {
                     </NavLink>
 
                     <NavLink
-                        to="/user/perfil"
+                        to="/user/mi-perfil"
                         className={({ isActive }) => "navItem" + (isActive ? " active" : "")}
                         onClick={closeSidebar}
                     >
@@ -73,4 +73,4 @@ function SideBarUser() {
     );
 }
 
-export default SideBarUser;
+export default SideBar;

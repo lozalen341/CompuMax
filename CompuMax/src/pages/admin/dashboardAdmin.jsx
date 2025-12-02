@@ -1,6 +1,6 @@
 import styles from "../../assets/css/Dashboard.module.css";
 
-function DashboardContent() {
+function DashboardAdmin() {
     return (
         <>
             <div className={styles.contentHeader}>
@@ -63,7 +63,7 @@ function DashboardContent() {
 function AdminDashboard() {
     return (
         <div className={styles.mainContent}>
-            <DashboardContent />
+            <DashboardAdmin />
         </div>
     );
 }

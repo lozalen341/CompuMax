@@ -11,15 +11,15 @@ import AdminLayout from '../pages/layouts/AdminLayout';
 import UserLayout from '../pages/layouts/UserLayout';
 
 // Secciones admin
-import DashboardAdmin from '../pages/admin/dashboard';
+import DashboardAdmin from '../pages/admin/dashboardAdmin';
 import GestionTurnos from '../pages/admin/GestionTurnos';
 import GestionUsuarios from '../pages/admin/GestionUsuarios';
 
 // secciones User
-import DashboardUser from '../pages/user/dashboard';
-import MiPerfil from '../pages/user/MiPerfil';
+import DashboardUser from '../pages/user/DashboardUser';
+import MisTurnos from '../pages/user/MisTurnos';
 import NuevoTurno from '../pages/user/NuevoTurno';
-
+import Perfil from '../pages/user/Perfil';
 
 
 export default function AppRouter() {
@@ -51,9 +51,15 @@ export default function AppRouter() {
                     {/* dashboard */}
                     <Route index element={<DashboardUser />} />
 
-                    <Route path="perfil" element={<MiPerfil />} />
+                    {/* mis turnos */}
+                    <Route path="mis-turnos" element={<MisTurnos />} />
 
-                    <Route path="turnos" element={<NuevoTurno />} />
+                    {/* nuevo turno */}
+                    <Route path="nuevo-turno" element={<NuevoTurno />} />
+
+                    {/* Perfil de usuario */}
+                    <Route path="mi-perfil" element={<Perfil />} />
+
                 </Route>
             </Routes>
         </AnimatePresence>
