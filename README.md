@@ -2,10 +2,10 @@
   <img src="CompuMax-blanco.png" alt="CompuMax Logo" />
 </p>
 
-- **[Backend](./api)**
+- **[Backend](./backend)**
   Contiene la API, lógica y datos.
 
-- **[Frontend](./CompuMax)**
+- **[Frontend](./frontend)**
   Contiene la aplicación de interfaz de usuario.
 
 ---
@@ -14,7 +14,7 @@
 
 ```
 .
-├── api/   # Código del servidor (API, servicios, base de datos)
-├── CompuMax/  # Aplicación cliente (interfaz de usuario)
+├── backend/   # Código del servidor (API, servicios, base de datos)
+├── frontend/  # Aplicación cliente (interfaz de usuario)
 └── README.md  # Documentación general del proyecto
 ```
