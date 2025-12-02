@@ -218,38 +218,47 @@ exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Validar que se enviaron email y contraseña
         if (!email || !password) {
             return res.status(401).json({ error: "Es necesario el email y la contraseña" });
         }
 
-        // Buscar usuario por email
         const user = await Users.login(email);
+        console.log("Respuesta Users.login:", user);
 
         if (!user) {
             return res.status(401).json({ error: "Usuario no encontrado" });
         }
 
-        // Verificar contraseña
-        const valid = await bcrypt.compare(password, user.password);
+        // Puede venir como array o como objeto|
+        const usr = Array.isArray(user) ? user[0] : user;
+
+        if (!usr) {
+            return res.status(401).json({ error: "Usuario no encontrado" });
+        }
+
+        if (!usr.password) {
+            return res.status(500).json({ error: "Error interno: usuario sin contraseña" });
+        }
+
+        const valid = await bcrypt.compare(password, usr.password);
         if (!valid) {
             return res.status(401).json({ error: "Contraseña incorrecta" });
         }
 
-        // Generar token JWT
-        require('dotenv').config();
         const token = jwt.sign(
-            { id: user.id_user, email: user.email, type: user.type },
+            { id: usr.id_user, email: usr.email, type: usr.type },
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         );
 
-        res.json({ 
-            message: "Se inicio sesion correctamente correctamente", 
-            token, 
-            user: { id: user.id_user, email: user.email, type: user.type }
+        return res.json({
+            message: "Login exitoso",
+            token,
+            user: { id: usr.id_user, email: usr.email, type: usr.type }
         });
+
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.log(error);
+        return res.status(500).json({ error: error.message });
     }
 };

@@ -381,13 +381,34 @@ footer {
     overflow-x: auto;
 }
 
+/* ========== USER LAYOUT ========== */
+.userLayout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+}
+.userContent {
+    padding: 2rem;
+    width: 100%;
+    overflow-x: auto;
+}
+
 /* ========== RESPONSIVE GLOBAL ========== */
 @media (max-width: 1024px) {
     .adminLayout {
         grid-template-columns: 1fr; /* Sidebar oculto en móvil */
     }
 
+    .userLayout {
+        grid-template-columns: 1fr; /* Sidebar oculto en móvil */
+    }
+
     .adminContent {
+        padding: 2rem;
+        padding-top: 5rem; /* Espacio para el header fijo móvil */
+    }
+
+    .userContent {
         padding: 2rem;
         padding-top: 5rem; /* Espacio para el header fijo móvil */
     }
@@ -412,6 +433,11 @@ footer {
         padding: 1rem;
         padding-top: 4.5rem; /* Ajuste para header móvil más pequeño */
     }
+
+    .userContent {
+        padding: 1rem;
+        padding-top: 4.5rem; /* Ajuste para header móvil más pequeño */
+    }
 }
 
 @media (max-width: 480px) {
@@ -424,6 +450,11 @@ footer {
     }
 
     .adminContent {
+        padding: 0.75rem;
+        padding-top: 4rem; /* Ajuste para pantallas muy pequeñas */
+    }
+
+    .userContent {
         padding: 0.75rem;
         padding-top: 4rem; /* Ajuste para pantallas muy pequeñas */
     }

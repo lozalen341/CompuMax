@@ -1,62 +1,83 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "../../assets/css/GestionTurnos.module.css";
 
-// Datos de ejemplo
-const turnosEjemplo = [
-    {
-        id: "#1523",
-        cliente: "Juan Pérez",
-        servicio: "Reparación de PC",
-        fecha: "15/11/2025",
-        hora: "10:00 AM",
-        estado: "Pendiente",
-        descripcion: "Problema con placa madre"
-    },
-    {
-        id: "#1522",
-        cliente: "María García",
-        servicio: "Mantenimiento",
-        fecha: "15/11/2025",
-        hora: "11:30 AM",
-        estado: "En Proceso",
-        descripcion: "Limpieza preventiva anual"
-    },
-    {
-        id: "#1521",
-        cliente: "Carlos Rodríguez",
-        servicio: "Dispositivos Móviles",
-        fecha: "14/11/2025",
-        hora: "02:00 PM",
-        estado: "Finalizado",
-        descripcion: "Cambio de pantalla"
-    },
-    {
-        id: "#1520",
-        cliente: "Ana Martínez",
-        servicio: "Recuperación de Datos",
-        fecha: "14/11/2025",
-        hora: "03:30 PM",
-        estado: "Pendiente",
-        descripcion: "Disco duro dañado"
-    },
-    {
-        id: "#1519",
-        cliente: "Luis Fernández",
-        servicio: "Reparación de PC",
-        fecha: "13/11/2025",
-        hora: "09:00 AM",
-        estado: "Finalizado",
-        descripcion: "Actualización de RAM"
-    }
-];
-
-
-
 function GestionTurnos() {
+    const [users, setUsers] = useState([]);
+
+    async function handleGetAll() {
+
+        const API_KEY = import.meta.env.VITE_API_KEY;
+
+        try {
+            const res = await fetch('http://localhost:3000/turnos/getall', {
+                method: 'GET',
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": API_KEY
+                },
+            });
+
+            const result = await res.json();
+            setUsers(result.user);
+            console.log(result.user);
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleDelete = async (e, idTicket) => {
+        e.preventDefault();
+
+        const API_KEY = import.meta.env.VITE_API_KEY;
+
+        try {
+            const res = await fetch(`http://localhost:3000/turnos/delete/${idTicket}`, {
+                method: 'DELETE',
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": API_KEY
+                },
+            });
+
+            const result = await res.json();
+            setUsers(users.filter(t => t.id_ticket !== idTicket));
+
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleEdit = async (e, ) => {
+        e.preventDefault();
+
+        const API_KEY = import.meta.env.VITE_API_KEY;
+
+        try {
+            const res = await fetch(`http://localhost:3000/turnos/delete/${idTicket}`, {
+                method: 'DELETE',
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": API_KEY
+                },
+            });
+
+            const result = await res.json();
+            setUsers(users.filter(t => t.id_ticket !== idTicket));
+
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const [filtroEstado, setFiltroEstado] = useState("Todos");
     const [filtroServicio, setFiltroServicio] = useState("Todos los servicios");
     const [filtroFecha, setFiltroFecha] = useState("Hoy");
     const [busqueda, setBusqueda] = useState("");
+
+    useEffect(() => {
+        handleGetAll();
+    }, []);
 
     return (
         <main className={styles.mainContent}>
@@ -68,7 +89,7 @@ function GestionTurnos() {
                 </div>
                 <div className={styles.headerActions}>
                     <div className={styles.searchBox}>
-                        <span className={styles.searchIcon}>🔍</span>
+                        <span className={styles.searchIcon}></span>
                         <input
                             type="text"
                             className={styles.searchInput}
@@ -89,16 +110,16 @@ function GestionTurnos() {
                 <div className={`${styles.statCard} ${styles.statPending}`}>
                     <div className={styles.statIcon}>⏳</div>
                     <div className={styles.statContent}>
-                        <h3>12</h3>
+                        <h3>1</h3>
                         <p>Turnos Pendientes</p>
-                        <span className={styles.statTrend}>↑ 3 desde ayer</span>
+                        <span className={styles.statTrend}>↑ 1 desde ayer</span>
                     </div>
                 </div>
 
                 <div className={`${styles.statCard} ${styles.statProcess}`}>
                     <div className={styles.statIcon}>🔧</div>
                     <div className={styles.statContent}>
-                        <h3>8</h3>
+                        <h3>0</h3>
                         <p>En Proceso</p>
                         <span className={styles.statTrend}>→ Sin cambios</span>
                     </div>
@@ -107,18 +128,18 @@ function GestionTurnos() {
                 <div className={`${styles.statCard} ${styles.statCompleted}`}>
                     <div className={styles.statIcon}>✓</div>
                     <div className={styles.statContent}>
-                        <h3>45</h3>
+                        <h3>0</h3>
                         <p>Finalizados Hoy</p>
-                        <span className={styles.statTrend}>↑ 12 desde ayer</span>
+                        <span className={styles.statTrend}>→ Sin cambios</span>
                     </div>
                 </div>
 
                 <div className={`${styles.statCard} ${styles.statRevenue}`}>
                     <div className={styles.statIcon}>💰</div>
                     <div className={styles.statContent}>
-                        <h3>$128K</h3>
+                        <h3>$0</h3>
                         <p>Ingresos del Mes</p>
-                        <span className={styles.statTrend}>↑ 8% vs mes anterior</span>
+                        <span className={styles.statTrend}>→ Sin cambios</span>
                     </div>
                 </div>
             </div>
@@ -182,60 +203,93 @@ function GestionTurnos() {
                     </div>
                 </div>
 
-                <div className={styles.tableWrapper}>
-                    <table className={styles.dataTable}>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Cliente</th>
-                                <th>Servicio</th>
-                                <th>Fecha</th>
-                                <th>Hora</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {turnosEjemplo.map((turno) => (
-                                <tr key={turno.id} className={styles.tableRow}>
-                                    <td className={styles.idCell}>{turno.id}</td>
-                                    <td className={styles.clienteCell}>
-                                        <div className={styles.avatar}>{turno.cliente.charAt(0)}</div>
-                                        {turno.cliente}
-                                    </td>
-                                    <td>{turno.servicio}</td>
-                                    <td>{turno.fecha}</td>
-                                    <td className={styles.horaCell}>{turno.hora}</td>
+                {/* Vista Desktop - Tabla */}
+                <div className={styles.desktopView}>
+                    <div className={styles.tableWrapper}>
+                        <table className={styles.dataTable}>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>ID del cliente</th>
+                                    <th>Servicio</th>
+                                    <th>Fecha</th>
+                                    <th>Hora</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                                <tbody>
+                                {users.map((t) => (
+                                    <tr key={t.id_ticket}>
+                                    <td>{t.id_ticket}</td>
+                                    <td>{t.id_user}</td>
+                                    <td>{t.description}</td>
+                                    <td>{new Date(t.dateCreated).toLocaleDateString()}</td>
+                                    <td>{new Date(t.deliveryTime).toLocaleTimeString()}</td>
                                     <td>
-                                        <span className={`${styles.statusBadge} ${styles[turno.estado.toLowerCase().replace(' ', '-')]}`}>
-                                            {turno.estado}
+                                        <span className={`${styles.statusBadge} ${styles[t.status.replace(' ', '-')]}`}>
+                                        {t.status}
                                         </span>
                                     </td>
                                     <td>
                                         <div className={styles.actionButtons}>
-                                            <button className={`${styles.btnAction} ${styles.btnView}`}>👁️</button>
-                                            <button className={`${styles.btnAction} ${styles.btnEdit}`}>✏️</button>
-                                            <button className={`${styles.btnAction} ${styles.btnDelete}`}>🗑️</button>
+                                            <button className={`${styles.btnAction} ${styles.btnView}`} title="Ver">👁️</button>
+                                            <button className={`${styles.btnAction} ${styles.btnEdit}`} title="Editar">✏️</button>
+                                            <button className={`${styles.btnAction} ${styles.btnDelete}`} title="Eliminar" onClick={(e) => handleDelete(e, t.id_ticket)}>🗑️</button>
                                         </div>
                                     </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                    </tr>
+                                ))}
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* Vista Mobile - Cards */}
+                <div className={styles.mobileView}>
+                {users.map((t) => (
+                    <div key={t.id_ticket} className={styles.turnoCard}>
+                    <div className={styles.cardHeader}>
+                        <div className={styles.cardHeaderLeft}>
+                        <div className={styles.avatar}>{t.id_user}</div>
+                        <div className={styles.cardInfo}>
+                            <h3 className={styles.cardCliente}>{t.description}</h3>
+                            <span className={styles.cardId}>{t.id_ticket}</span>
+                        </div>
+                        </div>
+                        <span className={`${styles.statusBadge} ${styles[t.status.replace(' ', '-')]}`}>
+                        {t.status}
+                        </span>
+                    </div>
+
+                    <div className={styles.cardBody}>
+                        <div className={styles.cardDetail}>
+                        <span className={styles.cardLabel}>📆 Fecha:</span>
+                        <span className={styles.cardValue}>{new Date(t.dateCreated).toLocaleDateString()}</span>
+                        </div>
+                        <div className={styles.cardDetail}>
+                        <span className={styles.cardLabel}>⏰ Hora:</span>
+                        <span className={styles.cardValue}>{new Date(t.deliveryTime).toLocaleTimeString()}</span>
+                        </div>
+                    </div>
+
+                    <div className={styles.cardFooter}>
+                        <button className={`${styles.btnAction} ${styles.btnView}`} title="Ver">👁️ Ver</button>
+                        <button className={`${styles.btnAction} ${styles.btnEdit}`} title="Editar">✏️ Editar</button>
+                        <button className={`${styles.btnAction} ${styles.btnDelete}`} title="Eliminar">🗑️ Eliminar</button>
+                    </div>
+                    </div>
+                ))}
                 </div>
 
                 <div className={styles.pagination}>
                     <div className={styles.paginationInfo}>
-                        Mostrando 1-5 de 65 turnos
+                        Mostrando 1-1 de 1 turno
                     </div>
                     <div className={styles.paginationButtons}>
                         <button className={styles.pageBtn} disabled>‹ Anterior</button>
                         <button className={`${styles.pageBtn} ${styles.active}`}>1</button>
-                        <button className={styles.pageBtn}>2</button>
-                        <button className={styles.pageBtn}>3</button>
-                        <button className={styles.pageBtn}>...</button>
-                        <button className={styles.pageBtn}>13</button>
-                        <button className={styles.pageBtn}>Siguiente ›</button>
+                        <button className={styles.pageBtn} disabled>Siguiente ›</button>
                     </div>
                 </div>
             </div>
