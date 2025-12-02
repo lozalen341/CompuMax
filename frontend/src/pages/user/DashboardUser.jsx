@@ -1,9 +1,87 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "../../assets/css/DashboardUser.module.css";
 
 function DashboardUser() {
-    // Datos de ejemplo - reemplazar con datos reales del usuario
-    const userName = "Juan Pérez";
-    
+    const [turnos, setTurnos] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
+    const userId = localStorage.getItem('userId');
+    const userName = localStorage.getItem('userName') || 'Usuario';
+
+    // Fetch user's turnos
+    useEffect(() => {
+        const fetchTurnos = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const API_KEY = import.meta.env.VITE_API_KEY;
+                
+                const response = await fetch(`http://localhost:3000/turnos/getById/${userId}`, {
+                    headers: {
+                        'x-api-key': API_KEY,
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al cargar los turnos');
+                }
+
+                const data = await response.json();
+                setTurnos(data.user || []);
+            } catch (err) {
+                console.error('Error:', err);
+                setError(err.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        if (userId) {
+            fetchTurnos();
+        }
+    }, [userId]);
+
+    // Calculate counts by status
+    const getCountByStatus = (status) => {
+        return turnos.filter(turno => turno.status.toLowerCase() === status.toLowerCase()).length;
+    };
+
+    const pendientesCount = getCountByStatus('pendiente');
+    const enProcesoCount = getCountByStatus('en proceso');
+    const completadosCount = getCountByStatus('completado');
+    const totalTurnos = turnos.length;
+
+    // Get next 3 upcoming non-completed turnos
+    const getUpcomingTurnos = () => {
+        const now = new Date();
+        return turnos
+            .filter(turno => 
+                turno.status.toLowerCase() !== 'completado' && 
+                new Date(turno.deliveryTime) > now
+            )
+            .sort((a, b) => new Date(a.deliveryTime) - new Date(b.deliveryTime))
+            .slice(0, 3);
+    };
+
+    const upcomingTurnos = getUpcomingTurnos();
+
+    // Format date for display
+    const formatDate = (dateString) => {
+        const options = { day: 'numeric', month: 'short', year: 'numeric' };
+        return new Date(dateString).toLocaleDateString('es-ES', options);
+    };
+
+    // Format time for display
+    const formatTime = (dateString) => {
+        const options = { hour: '2-digit', minute: '2-digit' };
+        return new Date(dateString).toLocaleTimeString('es-ES', options);
+    };
+
+    if (isLoading) return <div className={styles.loading}>Cargando...</div>;
+    if (error) return <div className={styles.error}>Error: {error}</div>;
+
     return (
         <div className={styles.mainContent}>
             {/* Header con saludo personalizado */}
@@ -13,7 +91,10 @@ function DashboardUser() {
                     <p className={styles.pageSubtitle}>Bienvenido a tu panel de gestión</p>
                 </div>
                 <div className={styles.headerActions}>
-                    <button className={styles.btnPrimary}>
+                    <button 
+                        className={styles.btnPrimary}
+                        onClick={() => navigate('/user/nuevo-turno')}
+                    >
                         <span>+</span>
                         <span>Nuevo Turno</span>
                     </button>
@@ -27,7 +108,7 @@ function DashboardUser() {
                         ⏳
                     </div>
                     <div className={styles.statContent}>
-                        <h3 className={styles.statNumber}>2</h3>
+                        <h3 className={styles.statNumber}>{pendientesCount}</h3>
                         <p className={styles.statLabel}>Turnos Pendientes</p>
                         <span className={styles.statTrend}>→ Próximos en la semana</span>
                     </div>
@@ -38,7 +119,7 @@ function DashboardUser() {
                         🔧
                     </div>
                     <div className={styles.statContent}>
-                        <h3 className={styles.statNumber}>1</h3>
+                        <h3 className={styles.statNumber}>{enProcesoCount}</h3>
                         <p className={styles.statLabel}>En Proceso</p>
                         <span className={styles.statTrend}>→ En reparación</span>
                     </div>
@@ -49,7 +130,7 @@ function DashboardUser() {
                         ✓
                     </div>
                     <div className={styles.statContent}>
-                        <h3 className={styles.statNumber}>8</h3>
+                        <h3 className={styles.statNumber}>{completadosCount}</h3>
                         <p className={styles.statLabel}>Completados</p>
                         <span className={styles.statTrend}>→ Este mes</span>
                     </div>
@@ -60,7 +141,7 @@ function DashboardUser() {
                         📋
                     </div>
                     <div className={styles.statContent}>
-                        <h3 className={styles.statNumber}>11</h3>
+                        <h3 className={styles.statNumber}>{totalTurnos}</h3>
                         <p className={styles.statLabel}>Total de Turnos</p>
                         <span className={styles.statTrend}>→ Histórico</span>
                     </div>
@@ -75,85 +156,42 @@ function DashboardUser() {
                 </div>
                 
                 <div className={styles.turnosList}>
-                    {/* Turno 1 */}
-                    <div className={styles.turnoItem}>
-                        <div className={styles.turnoLeft}>
-                            <div className={styles.turnoIcon}>💻</div>
-                            <div className={styles.turnoInfo}>
-                                <h3 className={styles.turnoTitle}>Reparación de PC</h3>
-                                <p className={styles.turnoDescription}>Mantenimiento preventivo y limpieza</p>
+                    {upcomingTurnos.length > 0 ? (
+                        upcomingTurnos.map(turno => (
+                            <div key={turno.id_ticket} className={styles.turnoItem}>
+                                <div className={styles.turnoLeft}>
+                                    <div className={styles.turnoIcon}>
+                                        {turno.description.includes('PC') ? '💻' : '📱'}
+                                    </div>
+                                    <div className={styles.turnoInfo}>
+                                        <h3 className={styles.turnoTitle}>
+                                            {turno.description.split('-')[0].trim()}
+                                        </h3>
+                                        <p className={styles.turnoDescription}>
+                                            {turno.description.split('-').slice(1).join('-').trim() || 'Sin descripción adicional'}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className={styles.turnoRight}>
+                                    <div className={styles.turnoDate}>
+                                        <span className={styles.dateLabel}>📆 Fecha</span>
+                                        <span className={styles.dateValue}>{formatDate(turno.deliveryTime)}</span>
+                                    </div>
+                                    <div className={styles.turnoTime}>
+                                        <span className={styles.timeLabel}>⏰ Hora</span>
+                                        <span className={styles.timeValue}>{formatTime(turno.deliveryTime)}</span>
+                                    </div>
+                                    <span className={`${styles.statusBadge} ${styles[turno.status.toLowerCase().replace(' ', '')]}`}>
+                                        {turno.status}
+                                    </span>
+                                </div>
                             </div>
+                        ))
+                    ) : (
+                        <div className={styles.noTurnos}>
+                            <p>No tienes turnos programados próximamente.</p>
                         </div>
-                        <div className={styles.turnoRight}>
-                            <div className={styles.turnoDate}>
-                                <span className={styles.dateLabel}>📆 Fecha</span>
-                                <span className={styles.dateValue}>15 Dic, 2024</span>
-                            </div>
-                            <div className={styles.turnoTime}>
-                                <span className={styles.timeLabel}>⏰ Hora</span>
-                                <span className={styles.timeValue}>10:30 AM</span>
-                            </div>
-                            <span className={`${styles.statusBadge} ${styles.pendiente}`}>Pendiente</span>
-                        </div>
-                    </div>
-
-                    {/* Turno 2 */}
-                    <div className={styles.turnoItem}>
-                        <div className={styles.turnoLeft}>
-                            <div className={styles.turnoIcon}>📱</div>
-                            <div className={styles.turnoInfo}>
-                                <h3 className={styles.turnoTitle}>Reparación de Celular</h3>
-                                <p className={styles.turnoDescription}>Cambio de pantalla</p>
-                            </div>
-                        </div>
-                        <div className={styles.turnoRight}>
-                            <div className={styles.turnoDate}>
-                                <span className={styles.dateLabel}>📆 Fecha</span>
-                                <span className={styles.dateValue}>18 Dic, 2024</span>
-                            </div>
-                            <div className={styles.turnoTime}>
-                                <span className={styles.timeLabel}>⏰ Hora</span>
-                                <span className={styles.timeValue}>14:00 PM</span>
-                            </div>
-                            <span className={`${styles.statusBadge} ${styles.proceso}`}>En Proceso</span>
-                        </div>
-                    </div>
-
-                    {/* Sin turnos próximos (comentado por defecto)
-                    <div className={styles.emptyState}>
-                        <div className={styles.emptyIcon}>📭</div>
-                        <h3 className={styles.emptyTitle}>No tienes turnos próximos</h3>
-                        <p className={styles.emptyDescription}>Solicita un nuevo turno para agendar un servicio</p>
-                        <button className={styles.btnEmpty}>Solicitar Turno</button>
-                    </div>
-                    */}
-                </div>
-            </div>
-
-            {/* Acciones Rápidas */}
-            <div className={styles.quickActions}>
-                <h2 className={styles.sectionTitle}>⚡ Acciones Rápidas</h2>
-                <div className={styles.actionsGrid}>
-                    <div className={styles.actionCard}>
-                        <div className={styles.actionIcon}>📅</div>
-                        <h3 className={styles.actionTitle}>Nuevo Turno</h3>
-                        <p className={styles.actionDescription}>Solicita un nuevo servicio</p>
-                        <button className={styles.actionBtn}>Solicitar</button>
-                    </div>
-
-                    <div className={styles.actionCard}>
-                        <div className={styles.actionIcon}>📋</div>
-                        <h3 className={styles.actionTitle}>Mis Turnos</h3>
-                        <p className={styles.actionDescription}>Ver todos mis turnos</p>
-                        <button className={styles.actionBtn}>Ver</button>
-                    </div>
-
-                    <div className={styles.actionCard}>
-                        <div className={styles.actionIcon}>👤</div>
-                        <h3 className={styles.actionTitle}>Mi Perfil</h3>
-                        <p className={styles.actionDescription}>Actualizar mis datos</p>
-                        <button className={styles.actionBtn}>Editar</button>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>
