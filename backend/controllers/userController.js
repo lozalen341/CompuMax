@@ -262,3 +262,27 @@ exports.login = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
+
+/**
+ * Cierra la sesión del usuario
+ * @function logout
+ * @param {Object} req - Objeto de solicitud de Express
+ * @param {Object} res - Objeto de respuesta de Express
+ * @returns {Object} Respuesta JSON confirmando el cierre de sesión
+ */
+exports.logout = (req, res) => {
+    try {
+        // En una implementación con tokens, aquí podríamos invalidar el token si es necesario
+        // Por ahora, simplemente devolvemos una respuesta exitosa
+        return res.status(200).json({
+            ok: true,
+            message: 'Sesión cerrada correctamente'
+        });
+    } catch (error) {
+        console.error('Error en logout:', error);
+        return res.status(500).json({
+            ok: false,
+            error: 'Error al cerrar sesión'
+        });
+    }
+};
