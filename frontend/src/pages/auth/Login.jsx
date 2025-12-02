@@ -37,6 +37,7 @@ function Login() {
 
                 localStorage.setItem("token", result.token);
                 localStorage.setItem("userType", result.user.type);
+                localStorage.setItem("userId", result.user.id);
                 
                 setTimeout(() => {
                     if (result.user.type === 0) navigate("/admin");
