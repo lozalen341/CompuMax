@@ -2,10 +2,12 @@ import { useState } from "react";
 import styles from "../../assets/css/Register.module.css";
 import { Link } from "react-router-dom";
 import AuthBrand from '../../components/AuthBrand';
+import { useNavigate } from "react-router-dom"
 
 function Register() {
     const [msg, setMsg] = useState("");
     const [msgType, setMsgType] = useState("");
+    const navigate = useNavigate();
 
     const [name, setName] = useState("");
     const [lastname, setLastname] = useState("");
@@ -37,6 +39,10 @@ function Register() {
 
             setMsg("Usuario creado correctamente");
             setMsgType("success");
+
+            setTimeout(() => {
+                navigate("/login")
+            }, 600);
 
         } catch (error) {
             setMsg("Error en el servidor");

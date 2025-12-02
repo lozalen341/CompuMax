@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import "../assets/css/SideBarAdmin.module.css";
+import "../assets/css/SideBarUser.module.css";
 
-function SideBar() {
+function SideBarUser() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
@@ -10,41 +10,58 @@ function SideBar() {
 
     return (
         <>
-            {/* Overlay - fuera del sidebar */}
+            {/* Overlay */}
             <div className={`overlay ${sidebarOpen ? 'active' : ''}`} onClick={closeSidebar}></div>
 
-            {/* Mobile Header - FUERA del sidebar */}
+            {/* Mobile Header */}
             <div className="mobileHeader">
                 <button className="menuBtn" onClick={toggleSidebar}>☰</button>
                 <div className="mobileLogo">CompuMax</div>
                 <div style={{ width: '40px' }}></div>
             </div>
 
-            {/* Sidebar - solo el menú lateral */}
+            {/* Sidebar */}
             <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
                 <div className="sidebarHeader">
                     <div className="sidebarLogo">CompuMax</div>
-                    <div className="sidebarRole">Panel de Administrador</div>
+                    <div className="sidebarRole">Panel de Usuario</div>
                 </div>
 
                 <nav className="sidebarNav">
                     <NavLink
-                        to="/admin/turnos"
-                        end
+                        to="/user/dashboard"
                         className={({ isActive }) => "navItem" + (isActive ? " active" : "")}
                         onClick={closeSidebar}
                     >
                         <span className="navIcon">📊</span>
-                        <span>Gestión de Turnos</span>
+                        <span>Dashboard</span>
                     </NavLink>
 
                     <NavLink
-                        to="/admin/usuarios"
+                        to="/user/mis-turnos"
                         className={({ isActive }) => "navItem" + (isActive ? " active" : "")}
                         onClick={closeSidebar}
                     >
-                        <span className="navIcon">👥</span>
-                        <span>Gestión de Usuarios</span>
+                        <span className="navIcon">📅</span>
+                        <span>Mis Turnos</span>
+                    </NavLink>
+
+                    <NavLink
+                        to="/user/nuevo-turno"
+                        className={({ isActive }) => "navItem" + (isActive ? " active" : "")}
+                        onClick={closeSidebar}
+                    >
+                        <span className="navIcon">➕</span>
+                        <span>Solicitar Turno</span>
+                    </NavLink>
+
+                    <NavLink
+                        to="/user/perfil"
+                        className={({ isActive }) => "navItem" + (isActive ? " active" : "")}
+                        onClick={closeSidebar}
+                    >
+                        <span className="navIcon">👤</span>
+                        <span>Mi Perfil</span>
                     </NavLink>
                 </nav>
 
@@ -56,4 +73,4 @@ function SideBar() {
     );
 }
 
-export default SideBar;
+export default SideBarUser;

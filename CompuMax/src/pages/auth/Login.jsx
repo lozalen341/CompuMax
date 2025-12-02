@@ -41,7 +41,7 @@ function Login() {
                 setTimeout(() => {
                     if (result.user.type === 0) navigate("/admin");
                     if (result.user.type === 1) navigate("/user");
-                }, 800);
+                }, 700);
 
             } else {
                 setMsg(result.error);

@@ -11,6 +11,7 @@
 .mainContent {
     padding: 2rem;
     overflow-y: auto;
+    max-width: 100%;
 }
 
 /* ========== HEADER CON GRADIENTE ========== */
@@ -67,7 +68,7 @@
 }
 
 .searchInput {
-    padding: 0.875rem 1rem 0.875rem 3rem;
+    padding: 0.875rem 1rem 0.875rem 7rem;
     border: none;
     border-radius: 10px;
     font-size: 0.95rem;
@@ -104,20 +105,20 @@
 /* ========== STATS GRID ========== */
 .statsGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
 
 .statCard {
     background: var(--bg-white);
-    padding: 1.75rem;
+    padding: 1.5rem;
     border-radius: 16px;
     box-shadow: var(--shadow-md);
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1.25rem;
     position: relative;
     overflow: hidden;
 }
@@ -133,7 +134,7 @@
 }
 
 .statCard:hover {
-    transform: translateY(-6px);
+    transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
 }
 
@@ -143,13 +144,13 @@
 .statRevenue::before { background: linear-gradient(90deg, #10B981, #059669); }
 
 .statIcon {
-    width: 60px;
-    height: 60px;
+    width: 55px;
+    height: 55px;
     border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    font-size: 1.8rem;
     flex-shrink: 0;
 }
 
@@ -163,7 +164,7 @@
 }
 
 .statContent h3 {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 0.25rem;
     color: var(--text-primary);
@@ -171,14 +172,14 @@
 }
 
 .statContent p {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 500;
     color: var(--text-secondary);
     margin-bottom: 0.5rem;
 }
 
 .statTrend {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
     display: flex;
     align-items: center;
@@ -203,7 +204,7 @@
     flex-direction: column;
     gap: 0.5rem;
     flex: 1;
-    min-width: 180px;
+    min-width: 160px;
 }
 
 .filterLabel {
@@ -223,7 +224,10 @@
     font-weight: 500;
 }
 
-.filterSelect:focus { border-color: var(--accent); }
+.filterSelect:focus { 
+    border-color: var(--accent); 
+    outline: none;
+}
 
 .btnExport {
     padding: 0.75rem 1.5rem;
@@ -233,6 +237,7 @@
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
+    transition: all 0.3s ease;
 }
 
 .btnExport:hover {
@@ -240,7 +245,7 @@
     color: white;
 }
 
-/* ========== DATA TABLE TIMELINE ========== */
+/* ========== DATA TABLE CONTAINER ========== */
 .dataTableContainer {
     background: var(--bg-white);
     border-radius: 16px;
@@ -248,64 +253,117 @@
     overflow: hidden;
 }
 
-.tableWrapper { overflow-x: auto; }
+.tableHeader {
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.tableTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tableActions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btnView {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--gray-300);
+    background: var(--bg-white);
+    color: var(--text-secondary);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.btnView:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* ========== VISTA DESKTOP (TABLA) ========== */
+.desktopView {
+    display: block;
+}
+
+.mobileView {
+    display: none;
+}
+
+.tableWrapper {
+    overflow-x: auto;
+    width: 100%;
+}
 
 .dataTable {
     width: 100%;
     border-collapse: collapse;
-    min-width: 900px;
 }
 
-.dataTable thead { background: var(--gray-50); }
+.dataTable thead { 
+    background: var(--gray-50);
+}
 
 .dataTable th {
-    padding: 1.25rem 1.75rem;
+    padding: 1rem;
     text-align: left;
     font-weight: 700;
     color: var(--text-secondary);
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.8px;
+    white-space: nowrap;
 }
 
 .dataTable td {
-    padding: 1.5rem 1.75rem;
+    padding: 1rem;
     border-top: 1px solid var(--gray-200);
     color: var(--text-primary);
     vertical-align: middle;
 }
 
 .tableRow {
-    transition: all 0.2s ease;
-    position: relative;
+    transition: background 0.2s ease;
 }
 
 .tableRow:hover {
-    background: rgba(74, 155, 142, 0.03);
+    background: rgba(74, 155, 142, 0.05);
 }
 
-.tableRow:hover::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: var(--accent);
+.idCell { 
+    font-weight: 700; 
+    color: var(--accent); 
+    font-size: 0.95rem;
+    white-space: nowrap;
 }
-
-.idCell { font-weight: 700; color: var(--accent); font-size: 0.95rem; }
 
 .clienteCell {
+    min-width: 180px;
+}
+
+.clienteInfo {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
     font-weight: 600;
 }
 
 .avatar {
-    width: 42px;
-    height: 42px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--accent), var(--primary));
     color: white;
@@ -313,12 +371,16 @@
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 0.95rem;
     flex-shrink: 0;
     box-shadow: var(--shadow-sm);
 }
 
-.horaCell { font-weight: 600; color: var(--primary); }
+.horaCell { 
+    font-weight: 600; 
+    color: var(--primary);
+    white-space: nowrap;
+}
 
 .statusBadge {
     display: inline-block;
@@ -328,6 +390,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
 .statusBadge.pendiente {
@@ -355,38 +418,150 @@
 }
 
 /* ========== ACTION BUTTONS ========== */
-.actionButtons { display: flex; gap: 0.5rem; }
+.actionButtons { 
+    display: flex; 
+    gap: 0.4rem;
+    justify-content: flex-start;
+}
 
 .btnAction {
-    padding: 0.625rem 0.875rem;
+    padding: 0.5rem 0.7rem;
     border: 2px solid transparent;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
 }
 
 .btnAction.btnView {
     background: rgba(74, 155, 142, 0.1);
     color: var(--accent);
 }
-.btnAction.btnView:hover { background: var(--accent); color: white; border-color: var(--accent); }
+.btnAction.btnView:hover { 
+    background: var(--accent); 
+    color: white; 
+    border-color: var(--accent);
+}
 
 .btnAction.btnEdit {
     background: rgba(59, 130, 246, 0.1);
     color: var(--status-process);
 }
-.btnAction.btnEdit:hover { background: var(--status-process); color: white; border-color: var(--status-process); }
+.btnAction.btnEdit:hover { 
+    background: var(--status-process); 
+    color: white; 
+    border-color: var(--status-process);
+}
 
 .btnAction.btnDelete {
     background: rgba(239, 68, 68, 0.1);
     color: var(--status-cancelled);
 }
-.btnAction.btnDelete:hover { background: var(--status-cancelled); color: white; border-color: var(--status-cancelled); }
+.btnAction.btnDelete:hover { 
+    background: var(--status-cancelled); 
+    color: white; 
+    border-color: var(--status-cancelled);
+}
+
+/* ========== VISTA MOBILE (CARDS) ========== */
+.turnoCard {
+    background: var(--bg-white);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.turnoCard:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--gray-100);
+}
+
+.cardHeaderLeft {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.cardInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.cardCliente {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.cardId {
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.cardBody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.cardDetail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cardLabel {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.cardValue {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    text-align: right;
+}
+
+.cardFooter {
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--gray-100);
+}
+
+.cardFooter .btnAction {
+    flex: 1;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
 
 /* ========== PAGINATION ========== */
 .pagination {
-    padding: 1.75rem 2rem;
+    padding: 1.5rem 2rem;
     border-top: 2px solid var(--gray-200);
     display: flex;
     justify-content: space-between;
@@ -398,52 +573,177 @@
 
 .paginationInfo {
     color: var(--text-secondary);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 500;
 }
 
-.paginationButtons { display: flex; gap: 0.5rem; }
+.paginationButtons { 
+    display: flex; 
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
 
 .pageBtn {
-    padding: 0.625rem 1rem;
+    padding: 0.6rem 0.9rem;
     border: 2px solid var(--gray-300);
     background: var(--bg-white);
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
     transition: all 0.3s ease;
-    min-width: 45px;
+    min-width: 42px;
+    font-size: 0.9rem;
 }
 
-.pageBtn:hover:not(:disabled) { background: var(--gray-50); border-color: var(--accent); color: var(--accent); }
-.pageBtn.active { background: var(--accent); color: white; border-color: var(--accent); transform: scale(1.05); }
-.pageBtn:disabled { opacity: 0.4; cursor: not-allowed; }
+.pageBtn:hover:not(:disabled) { 
+    background: var(--gray-50); 
+    border-color: var(--accent); 
+    color: var(--accent); 
+}
+
+.pageBtn.active { 
+    background: var(--accent); 
+    color: white; 
+    border-color: var(--accent); 
+}
+
+.pageBtn:disabled { 
+    opacity: 0.4; 
+    cursor: not-allowed; 
+}
 
 /* ========== RESPONSIVE ========== */
 @media (max-width: 1024px) {
-    .adminLayout { grid-template-columns: 1fr; }
-    .contentHeader { flex-direction: column; align-items: flex-start; }
-    .headerActions { width: 100%; flex-direction: column; }
-    .searchInput { width: 100%; min-width: unset; }
-    .btnPrimary { width: 100%; justify-content: center; }
+    .adminLayout { 
+        grid-template-columns: 1fr; 
+    }
+    
+    .contentHeader { 
+        flex-direction: column; 
+        align-items: flex-start; 
+    }
+    
+    .headerActions { 
+        width: 100%; 
+        flex-direction: column; 
+    }
+    
+    .searchInput { 
+        width: 100%; 
+        min-width: unset; 
+    }
+    
+    .btnPrimary { 
+        width: 100%; 
+        justify-content: center; 
+    }
+
+    .statsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 768px) {
-    .mainContent { padding: 1rem; }
-    .contentHeader { padding: 1.5rem; }
-    .pageTitle { font-size: 1.75rem; }
-    .statsGrid { grid-template-columns: 1fr; }
-    .filtersBar { flex-direction: column; align-items: stretch; }
-    .filterGroup { min-width: 100%; }
-    .btnExport { width: 100%; }
-    .dataTable { font-size: 0.85rem; min-width: 800px; }
-    .pagination { flex-direction: column; align-items: stretch; }
-    .paginationButtons { justify-content: center; }
+    .mainContent { 
+        padding: 1rem; 
+    }
+    
+    .contentHeader { 
+        padding: 1.5rem; 
+    }
+    
+    .pageTitle { 
+        font-size: 1.5rem; 
+    }
+    
+    .statsGrid { 
+        grid-template-columns: 1fr; 
+    }
+    
+    .filtersBar { 
+        flex-direction: column; 
+        align-items: stretch; 
+    }
+    
+    .filterGroup { 
+        min-width: 100%; 
+    }
+    
+    .btnExport { 
+        width: 100%; 
+    }
+
+    .tableHeader {
+        padding: 1rem;
+    }
+
+    .tableTitle {
+        font-size: 1.1rem;
+    }
+
+    .tableActions {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .tableActions .btnView {
+        flex: 1;
+        text-align: center;
+    }
+
+    /* CAMBIAR A VISTA DE CARDS EN MOBILE */
+    .desktopView {
+        display: none;
+    }
+
+    .mobileView {
+        display: block;
+        padding: 1rem;
+    }
+
+    .pagination { 
+        flex-direction: column; 
+        align-items: stretch;
+        padding: 1rem;
+    }
+    
+    .paginationButtons { 
+        justify-content: center; 
+    }
 }
 
 @media (max-width: 480px) {
-    .statContent h3 { font-size: 1.6rem; }
-    .statIcon { width: 50px; height: 50px; font-size: 1.6rem; }
-    .avatar { width: 36px; height: 36px; font-size: 0.9rem; }
-    .pageBtn { padding: 0.5rem 0.75rem; font-size: 0.85rem; min-width: 38px; }
+    .statCard {
+        padding: 1.25rem;
+    }
+
+    .statContent h3 { 
+        font-size: 1.5rem; 
+    }
+    
+    .statIcon { 
+        width: 48px; 
+        height: 48px; 
+        font-size: 1.5rem; 
+    }
+    
+    .avatar { 
+        width: 32px; 
+        height: 32px; 
+        font-size: 0.85rem; 
+    }
+    
+    .pageBtn { 
+        padding: 0.5rem 0.7rem; 
+        font-size: 0.85rem; 
+        min-width: 36px; 
+    }
+
+    .cardFooter {
+        flex-direction: column;
+    }
+
+    .cardFooter .btnAction {
+        width: 100%;
+    }
 }

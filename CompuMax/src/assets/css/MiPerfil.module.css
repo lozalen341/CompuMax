@@ -1,0 +1,508 @@
+/* MiPerfil.module.css */
+
+.mainContent {
+    padding: 2rem;
+    overflow-y: auto;
+    background: linear-gradient(135deg, #f5f7fa 0%, #E8F0F2 100%);
+    min-height: 100vh;
+}
+
+/* ========== HEADER ========== */
+.contentHeader {
+    background: linear-gradient(135deg, #4A9B8E 0%, #2C7A6F 100%);
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    color: white;
+}
+
+.headerLeft {
+    flex: 1;
+}
+
+.pageTitle {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.pageSubtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* ========== PROFILE CARD ========== */
+.profileCard {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-bottom: 2rem;
+}
+
+.profileHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.avatarSection {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4A9B8E 0%, #2C7A6F 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(74, 155, 142, 0.3);
+}
+
+.avatarInfo {
+    flex: 1;
+}
+
+.userName {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 0.5rem 0;
+}
+
+.userEmail {
+    font-size: 1rem;
+    color: #718096;
+    margin: 0;
+}
+
+.userStats {
+    display: flex;
+    gap: 2rem;
+}
+
+.statItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+
+.statValue {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #4A9B8E;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.statLabel {
+    font-size: 0.9rem;
+    color: #718096;
+    font-weight: 600;
+}
+
+/* ========== TABS ========== */
+.tabsContainer {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.tab {
+    flex: 1;
+    padding: 1.25rem 2rem;
+    background: transparent;
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #718096;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.tab:hover {
+    background: #f8f9fa;
+    color: #4A9B8E;
+}
+
+.tab.active {
+    color: #4A9B8E;
+    border-bottom-color: #4A9B8E;
+    background: #f8f9fa;
+}
+
+/* ========== TAB CONTENT ========== */
+.tabContent {
+    padding: 2rem;
+}
+
+/* ========== FORM ========== */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.formSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.formSectionTitle {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.formRow {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formLabel {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a202c;
+}
+
+.formInput {
+    padding: 0.875rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.formInput:focus {
+    border-color: #4A9B8E;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 155, 142, 0.1);
+}
+
+/* ========== INFO BOX ========== */
+.infoBox {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border-left: 4px solid #3B82F6;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.infoIcon {
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.infoContent {
+    flex: 1;
+}
+
+.infoTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 0.75rem 0;
+}
+
+.infoList {
+    margin: 0;
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.infoList li {
+    font-size: 0.9rem;
+    color: #4a5568;
+    line-height: 1.5;
+}
+
+/* ========== FORM ACTIONS ========== */
+.formActions {
+    display: flex;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid #f0f0f0;
+}
+
+.btnPrimary,
+.btnSecondary {
+    flex: 1;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btnPrimary {
+    background: linear-gradient(135deg, #4A9B8E 0%, #2C7A6F 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(74, 155, 142, 0.3);
+}
+
+.btnPrimary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(74, 155, 142, 0.4);
+}
+
+.btnSecondary {
+    background: white;
+    color: #4a5568;
+    border: 2px solid #e2e8f0;
+}
+
+.btnSecondary:hover {
+    background: #f8f9fa;
+    border-color: #cbd5e0;
+}
+
+/* ========== DANGER ZONE ========== */
+.dangerZone {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid #f0f0f0;
+}
+
+.dangerZoneTitle {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #EF4444;
+    margin: 0 0 1.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dangerZoneContent {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.dangerZoneItem {
+    background: #fff5f5;
+    border: 2px solid #feb2b2;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.dangerZoneItemTitle {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin: 0 0 0.5rem 0;
+}
+
+.dangerZoneItemDescription {
+    font-size: 0.9rem;
+    color: #718096;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.btnWarning {
+    padding: 0.75rem 1.5rem;
+    background: #F59E0B;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.btnWarning:hover {
+    background: #D97706;
+    transform: scale(1.05);
+}
+
+.btnDanger {
+    padding: 0.75rem 1.5rem;
+    background: #EF4444;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.btnDanger:hover {
+    background: #DC2626;
+    transform: scale(1.05);
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1024px) {
+    .profileHeader {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .userStats {
+        width: 100%;
+        justify-content: space-around;
+    }
+
+    .formRow {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .mainContent {
+        padding: 1rem;
+    }
+
+    .contentHeader {
+        padding: 1.5rem;
+    }
+
+    .pageTitle {
+        font-size: 1.8rem;
+    }
+
+    .profileCard {
+        padding: 1.5rem;
+    }
+
+    .avatarSection {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .avatar {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+    }
+
+    .userName {
+        font-size: 1.5rem;
+    }
+
+    .tabs {
+        flex-direction: column;
+    }
+
+    .tab {
+        padding: 1rem;
+    }
+
+    .tabContent {
+        padding: 1.5rem;
+    }
+
+    .formActions {
+        flex-direction: column-reverse;
+    }
+
+    .btnPrimary,
+    .btnSecondary {
+        width: 100%;
+    }
+
+    .dangerZoneItem {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .btnWarning,
+    .btnDanger {
+        width: 100%;
+    }
+
+    .infoBox {
+        flex-direction: column;
+    }
+
+    .infoIcon {
+        margin: 0 auto;
+    }
+
+    .infoList {
+        padding-left: 0;
+        list-style: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .userStats {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .statItem {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 1rem;
+    }
+
+    .statValue {
+        margin-bottom: 0;
+    }
+}
