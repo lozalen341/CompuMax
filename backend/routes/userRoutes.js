@@ -331,4 +331,35 @@ router.get('/auth', AuthMiddleware, (req, res)=>{
     res.json({user: req.user})
 })
 
+/**
+ * @swagger
+ * /users/logout:
+ *   post:
+ *     summary: Cierra la sesión del usuario
+ *     tags: [Usuarios]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Sesión cerrada exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Sesión cerrada correctamente
+ *       401:
+ *         description: No autorizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.post('/logout', UsersController.logout);
+
 module.exports = router;
