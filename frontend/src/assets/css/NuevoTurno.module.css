@@ -54,10 +54,17 @@
     font-size: 1.5rem;
     font-weight: 700;
     color: #1a202c;
-    margin: 0 0 1.5rem 0;
+    margin: 0 0 0.5rem 0;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+.serviciosHint {
+    font-size: 0.95rem;
+    color: #718096;
+    margin-bottom: 1.5rem;
+    display: block;
 }
 
 .serviciosGrid {
@@ -74,6 +81,8 @@
     transition: all 0.3s ease;
     border: 2px solid transparent;
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
 }
 
 .servicioCard:hover {
@@ -81,6 +90,45 @@
     box-shadow: 0 8px 20px rgba(0,0,0,0.12);
     border-color: #4A9B8E;
     background: white;
+}
+
+.servicioCardSelected {
+    background: linear-gradient(135deg, #E6F7F5 0%, #D1F0EC 100%) !important;
+    border: 2px solid #4A9B8E !important;
+    box-shadow: 0 8px 24px rgba(74, 155, 142, 0.25) !important;
+    transform: translateY(-4px) !important;
+}
+
+.checkMark {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    background: #4A9B8E;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(74, 155, 142, 0.4);
+    animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .servicioIcon {
@@ -116,6 +164,7 @@
     border-radius: 16px;
     padding: 2rem;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    scroll-margin-top: 20px;
 }
 
 .form {
@@ -222,6 +271,27 @@
     line-height: 1.5;
 }
 
+/* ========== MESSAGES ========== */
+.message {
+    padding: 1rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+.message.success {
+    background: #D1FAE5;
+    color: #065F46;
+    border: 2px solid #10B981;
+}
+
+.message.error {
+    background: #FEE2E2;
+    color: #991B1B;
+    border: 2px solid #EF4444;
+}
+
 /* ========== FORM ACTIONS ========== */
 .formActions {
     display: flex;
@@ -252,9 +322,14 @@
     box-shadow: 0 4px 12px rgba(74, 155, 142, 0.3);
 }
 
-.btnPrimary:hover {
+.btnPrimary:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(74, 155, 142, 0.4);
+}
+
+.btnPrimary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .btnSecondary {

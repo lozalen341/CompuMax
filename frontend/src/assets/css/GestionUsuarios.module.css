@@ -273,6 +273,54 @@
     color: var(--text-muted);
 }
 
+/* ========== SELECTOR DE CANTIDAD POR PÁGINA (NUEVO) ========== */
+.perPageSelector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 0.65rem 1.2rem;
+    border-radius: 10px;
+    border: 2px solid var(--gray-300);
+    transition: all 0.3s ease;
+}
+
+.perPageSelector:hover {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.perPageLabel {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.perPageSelect {
+    padding: 0.4rem 0.8rem;
+    border: 2px solid var(--accent);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    background: white;
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 60px;
+    text-align: center;
+}
+
+.perPageSelect:focus {
+    outline: none;
+    border-color: var(--accent-dark);
+    box-shadow: 0 0 0 3px rgba(74, 155, 142, 0.15);
+}
+
+.perPageSelect:hover {
+    background: var(--accent);
+    color: white;
+}
+
 .tableHeaderRight {
     display: flex;
     gap: 0.75rem;
@@ -294,6 +342,29 @@
 .btnExport:hover {
     background: var(--gray-50);
     border-color: var(--accent);
+}
+
+/* ========== LOADING ========== */
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    gap: 1rem;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--gray-200);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
 /* DATA TABLE AVATAR */
@@ -377,6 +448,29 @@
     color: var(--text-muted);
 }
 
+/* ========== BADGE DE TIPO ========== */
+.typeBadge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: capitalize;
+    transition: all 0.3s ease;
+}
+
+.typeAdmin {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    color: #92400E;
+    border: 2px solid #FCD34D;
+}
+
+.typeEmpleado {
+    background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+    color: #1E40AF;
+    border: 2px solid #93C5FD;
+}
+
 .contactInfo {
     display: flex;
     flex-direction: column;
@@ -456,9 +550,10 @@
     background: var(--accent);
     color: white;
     border-color: var(--accent);
+    transform: scale(1.05);
 }
 
-/* PAGINATION */
+/* ========== PAGINACIÓN MEJORADA ========== */
 .pagination {
     padding: 1.5rem;
     border-top: 1px solid var(--gray-200);
@@ -466,18 +561,95 @@
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 1rem;
+    gap: 1.5rem;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+}
+
+.paginationInfo {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.paginationControls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.paginationBtn {
+    padding: 0.7rem 1.3rem;
+    border: 2px solid var(--gray-300);
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+}
+
+.paginationBtn:hover:not(:disabled) {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 155, 142, 0.25);
+}
+
+.paginationBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: var(--gray-100);
+}
+
+.paginationNumbers {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.paginationNumber {
+    min-width: 40px;
+    height: 40px;
+    padding: 0.5rem;
+    border: 2px solid var(--gray-300);
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.paginationNumber:hover {
+    background: var(--gray-100);
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+}
+
+.paginationActive {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%) !important;
+    color: white !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 4px 12px rgba(74, 155, 142, 0.3);
+    transform: translateY(-2px);
+}
+
+.paginationDots {
+    padding: 0.5rem;
+    color: var(--text-muted);
+    font-weight: 600;
 }
 
 .paginationLeft {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-}
-
-.paginationInfo {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
 }
 
 .paginationSelect {
@@ -524,6 +696,85 @@
     align-items: center;
     padding: 0 0.5rem;
     color: var(--text-muted);
+}
+
+/* ===========================
+   BOTONES — ESTILO MEJORADO
+   =========================== */
+
+/* Botón Primario */
+.btnPrimary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: #fff;
+    padding: 0.8rem 1.7rem;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btnPrimary:hover {
+    background: linear-gradient(135deg, var(--accent-dark), var(--accent));
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+/* Botón Secundario */
+.btnSecondary {
+    background: var(--bg-white);
+    color: var(--primary-dark);
+    border: 2px solid var(--gray-300);
+    padding: 0.75rem 1.6rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.btnSecondary:hover {
+    background: var(--gray-100);
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+}
+
+/* Botones de acción de la tabla */
+.btnAction {
+    padding: 0.55rem 0.8rem;
+    border-radius: 8px;
+    background: var(--gray-100);
+    border: 1px solid var(--gray-300);
+    transition: all 0.25s ease;
+    font-size: 1rem;
+}
+
+.btnAction:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+/* Botones de filtros y exportación */
+.btnFilter,
+.btnExport {
+    padding: 0.7rem 1.3rem;
+    border-radius: 8px;
+    border: 1px solid var(--gray-300);
+    background: var(--bg-white);
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+.btnFilter:hover,
+.btnExport:hover {
+    background: var(--gray-100);
+    border-color: var(--accent);
+    color: var(--accent-dark);
+    transform: translateY(-2px);
 }
 
 /* RESPONSIVE */
@@ -574,13 +825,455 @@
         min-width: 900px;
     }
 
-    .pagination {
+    .tableHeader {
         flex-direction: column;
         align-items: stretch;
     }
 
-    .paginationRight {
+    .perPageSelector {
         justify-content: center;
+    }
+
+    .pagination {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .paginationInfo {
+        text-align: center;
+    }
+
+    .paginationControls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .paginationNumbers {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+/* ========== MODAL OVERLAY ========== */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 1rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modalContent {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 700px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modalDanger {
+    border: 3px solid #EF4444;
+}
+
+.modalHeader {
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 16px 16px 0 0;
+}
+
+.modalTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modalClose {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.modalClose:hover {
+    background: var(--gray-200);
+    color: var(--text-primary);
+    transform: rotate(90deg);
+}
+
+.modalBody {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.modalFooter {
+    padding: 1.5rem 2rem;
+    border-top: 2px solid var(--gray-200);
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border-radius: 0 0 16px 16px;
+}
+
+/* ========== USER DETAIL CARD ========== */
+.userDetailCard {
+    background: linear-gradient(135deg, #E6F7F5 0%, #D1F0EC 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 2px solid var(--accent);
+}
+
+.userDetailHeader {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.userDetailAvatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 2rem;
+    box-shadow: 0 4px 12px rgba(74, 155, 142, 0.3);
+}
+
+.userDetailName {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.userDetailInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.infoRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: white;
+    border-radius: 8px;
+}
+
+.infoLabel {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.infoValue {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+/* ========== SECTION CARDS ========== */
+.sectionCard {
+    background: var(--gray-50);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 2px solid var(--gray-200);
+}
+
+.sectionTitle {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* ========== TURNOS ========== */
+.turnosResumen {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.turnoStat {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    border: 2px solid var(--gray-300);
+}
+
+.turnoStatLabel {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.turnoStatValue {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.turnosLista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.turnoItem {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--gray-300);
+    font-size: 0.95rem;
+}
+
+.statusCompleted {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.statusPending {
+    background: rgba(251, 191, 36, 0.1);
+    color: #D97706;
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* ========== ACTIVITY ========== */
+.activityList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.activityItem {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border: 1px solid var(--gray-300);
+    font-size: 0.95rem;
+}
+
+.activityIcon {
+    font-size: 1.5rem;
+}
+
+/* ========== MODAL DANGER ========== */
+.warningBox {
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    border: 2px solid #F59E0B;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.warningIcon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.warningBox p {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-secondary);
+}
+
+.warningBox strong {
+    font-size: 1.2rem;
+    color: var(--text-primary);
+}
+
+/* ========== ACTIONS GRID ========== */
+.actionsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.btnBan,
+.btnDelete {
+    background: white;
+    border: 3px solid var(--gray-300);
+    border-radius: 12px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+}
+
+.btnBan:hover {
+    border-color: #F59E0B;
+    background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+}
+
+.btnDelete:hover {
+    border-color: #EF4444;
+    background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+.actionIcon {
+    font-size: 3rem;
+}
+
+.actionContent h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+}
+
+.actionContent p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.dangerNote {
+    background: linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%);
+    border: 2px solid #EF4444;
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.dangerNote strong {
+    color: #DC2626;
+}
+
+/* ========== MODAL BUTTONS ========== */
+.btnModalSecondary {
+    padding: 0.875rem 2rem;
+    border: 2px solid var(--gray-300);
+    background: white;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btnModalSecondary:hover {
+    background: var(--gray-100);
+    border-color: var(--accent);
+}
+
+/* ========== DANGER ACTION BUTTON ========== */
+.btnActionDanger:hover {
+    background: #EF4444 !important;
+    border-color: #DC2626 !important;
+    color: white !important;
+}
+
+@media (max-width: 768px) {
+    .modalContent {
+        max-width: 95%;
+        margin: 1rem;
+    }
+
+    .modalBody {
+        padding: 1.5rem;
+    }
+
+    .userDetailHeader {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .turnosResumen {
+        grid-template-columns: 1fr;
+    }
+
+    .actionsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .infoRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
 }
 
@@ -597,5 +1290,27 @@
         width: 35px;
         height: 35px;
         font-size: 0.8rem;
+    }
+
+    .paginationBtn {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .paginationNumber {
+        min-width: 35px;
+        height: 35px;
+        font-size: 0.85rem;
+    }
+
+    .userDetailAvatar {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+
+    .modalHeader,
+    .modalFooter {
+        padding: 1rem 1.5rem;
     }
 }

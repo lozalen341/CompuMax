@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../../assets/css/NuevoTurno.module.css";
 
@@ -6,7 +6,9 @@ function NuevoTurno() {
     const navigate = useNavigate();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [message, setMessage] = useState({ text: "", type: "" });
-    
+    const [selectedService, setSelectedService] = useState("");
+    const formRef = useRef(null);
+
     const [formData, setFormData] = useState({
         servicio: "",
         descripcion: "",
@@ -14,11 +16,71 @@ function NuevoTurno() {
         hora: ""
     });
 
-    const handleChange = (e) => {
+    const servicios = [
+        {
+            id: "reparacion-pc",
+            icon: "💻",
+            title: "Reparación de PC",
+            description: "Mantenimiento, limpieza y reparación de computadoras"
+        },
+        {
+            id: "dispositivos-moviles",
+            icon: "📱",
+            title: "Dispositivos Móviles",
+            description: "Reparación de celulares y tablets"
+        },
+        {
+            id: "recuperacion-datos",
+            icon: "💾",
+            title: "Recuperación de Datos",
+            description: "Rescate de información de discos duros"
+        },
+        {
+            id: "mantenimiento",
+            icon: "🔧",
+            title: "Mantenimiento",
+            description: "Limpieza y optimización de equipos"
+        },
+        {
+            id: "instalacion-software",
+            icon: "💿",
+            title: "Instalación de Software",
+            description: "Sistemas operativos y programas"
+        },
+        {
+            id: "impresoras",
+            icon: "🖨️",
+            title: "Impresoras",
+            description: "Configuración y reparación de impresoras"
+        }
+    ];
+
+    const handleServiceClick = (serviceId) => {
+        setSelectedService(serviceId);
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            servicio: serviceId
         });
+
+        // Scroll suave al formulario
+        setTimeout(() => {
+            formRef.current?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }, 100);
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+
+        if (name === 'servicio') {
+            setSelectedService(value);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -29,7 +91,7 @@ function NuevoTurno() {
         try {
             const token = localStorage.getItem('token');
             const userId = localStorage.getItem('userId');
-            
+
             if (!token || !userId) {
                 throw new Error('No se encontró la información de autenticación');
             }
@@ -83,6 +145,10 @@ function NuevoTurno() {
         }
     };
 
+    const hoy = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(hoy.getDate() + 60);
+
     return (
         <main className={styles.mainContent}>
             {/* Header */}
@@ -97,49 +163,31 @@ function NuevoTurno() {
                 {/* Servicios Disponibles */}
                 <div className={styles.serviciosSection}>
                     <h2 className={styles.sectionTitle}>🛠️ Servicios Disponibles</h2>
+                    <p className={styles.serviciosHint}>Selecciona el servicio que necesitas</p>
+
                     <div className={styles.serviciosGrid}>
-                        <div className={styles.servicioCard}>
-                            <div className={styles.servicioIcon}>💻</div>
-                            <h3 className={styles.servicioTitle}>Reparación de PC</h3>
-                            <p className={styles.servicioDescription}>Mantenimiento, limpieza y reparación de computadoras</p>
-                        </div>
-
-                        <div className={styles.servicioCard}>
-                            <div className={styles.servicioIcon}>📱</div>
-                            <h3 className={styles.servicioTitle}>Dispositivos Móviles</h3>
-                            <p className={styles.servicioDescription}>Reparación de celulares y tablets</p>
-                        </div>
-
-                        <div className={styles.servicioCard}>
-                            <div className={styles.servicioIcon}>💾</div>
-                            <h3 className={styles.servicioTitle}>Recuperación de Datos</h3>
-                            <p className={styles.servicioDescription}>Rescate de información de discos duros</p>
-                        </div>
-
-                        <div className={styles.servicioCard}>
-                            <div className={styles.servicioIcon}>🔧</div>
-                            <h3 className={styles.servicioTitle}>Mantenimiento</h3>
-                            <p className={styles.servicioDescription}>Limpieza y optimización de equipos</p>
-                        </div>
-
-                        <div className={styles.servicioCard}>
-                            <div className={styles.servicioIcon}>💿</div>
-                            <h3 className={styles.servicioTitle}>Instalación de Software</h3>
-                            <p className={styles.servicioDescription}>Sistemas operativos y programas</p>
-                        </div>
-
-                        <div className={styles.servicioCard}>
-                            <div className={styles.servicioIcon}>🖨️</div>
-                            <h3 className={styles.servicioTitle}>Impresoras</h3>
-                            <p className={styles.servicioDescription}>Configuración y reparación de impresoras</p>
-                        </div>
+                        {servicios.map((servicio) => (
+                            <div
+                                key={servicio.id}
+                                className={`${styles.servicioCard} ${selectedService === servicio.id ? styles.servicioCardSelected : ''
+                                    }`}
+                                onClick={() => handleServiceClick(servicio.id)}
+                            >
+                                {selectedService === servicio.id && (
+                                    <div className={styles.checkMark}>✓</div>
+                                )}
+                                <div className={styles.servicioIcon}>{servicio.icon}</div>
+                                <h3 className={styles.servicioTitle}>{servicio.title}</h3>
+                                <p className={styles.servicioDescription}>{servicio.description}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
                 {/* Formulario */}
-                <div className={styles.formSection}>
+                <div ref={formRef} className={styles.formSection}>
                     <h2 className={styles.sectionTitle}>📋 Detalles del Turno</h2>
-                    
+
                     <form onSubmit={handleSubmit} className={styles.form}>
                         <div className={styles.formGroup}>
                             <label className={styles.formLabel}>
@@ -153,13 +201,15 @@ function NuevoTurno() {
                                 required
                             >
                                 <option value="">Selecciona un servicio</option>
-                                <option value="reparacion-pc">Reparación de PC</option>
-                                <option value="dispositivos-moviles">Dispositivos Móviles</option>
-                                <option value="recuperacion-datos">Recuperación de Datos</option>
-                                <option value="mantenimiento">Mantenimiento</option>
-                                <option value="instalacion-software">Instalación de Software</option>
-                                <option value="impresoras">Impresoras</option>
+                                {servicios.map((servicio) => (
+                                    <option key={servicio.id} value={servicio.id}>
+                                        {servicio.title}
+                                    </option>
+                                ))}
                             </select>
+                            <span className={styles.formHint}>
+                                También puedes seleccionar una tarjeta arriba ☝️
+                            </span>
                         </div>
 
                         <div className={styles.formGroup}>
@@ -192,6 +242,8 @@ function NuevoTurno() {
                                     value={formData.fecha}
                                     onChange={handleChange}
                                     required
+                                    min={hoy.toISOString().split("T")[0]}
+                                    max={maxDate.toISOString().split("T")[0]}
                                 />
                             </div>
 
@@ -233,19 +285,19 @@ function NuevoTurno() {
                         </div>
 
                         {message.text && (
-        <div className={`${styles.message} ${message.type === 'error' ? styles.error : styles.success}`}>
-            {message.text}
-        </div>
-    )}
+                            <div className={`${styles.message} ${message.type === 'error' ? styles.error : styles.success}`}>
+                                {message.text}
+                            </div>
+                        )}
 
                         {/* Buttons */}
                         <div className={styles.formActions}>
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 className={styles.btnPrimary}
                                 disabled={isSubmitting}
                             >
-                                {isSubmitting ? 'Procesando...' : '✓ Solicitar Turno'}
+                                {isSubmitting ? '⏳ Procesando...' : '✓ Solicitar Turno'}
                             </button>
                         </div>
                     </form>
