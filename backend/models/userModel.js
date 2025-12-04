@@ -23,32 +23,37 @@ exports.getByEmail = async (email) => {
     return rows.length > 0 ? rows[0] : null;
 }
 
-exports.getByEmail = async (email) => {
-    const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
-    return rows[0];
-};
+// exports.getByEmail = async (email) => {
+//     const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
+//     return rows[0];
+// };
 
 exports.updateUser = async (id, datos) => {
-    const campos = []
-    const params = []
+    const campos = [];
+    const params = [];
 
-    const array = ["name", "lastname", "email", "type", "password"]
+    const array = ["name", "lastname", "email", "phone", "address", "type"];
 
     for (let i = 0; i < array.length; i++) {
         const element = array[i];
-        
-        if (datos[element] != undefined && datos.element != null) {
-            campos.push(`${element}=?`)
-            params.push(datos[element])
+
+        if (datos[element] !== undefined && datos[element] !== null) {
+            campos.push(`${element}=?`);
+            params.push(datos[element]);
         }
     }
-    
+
+    if (campos.length === 0) {
+        throw new Error("No se enviaron campos válidos para actualizar");
+    }
+
     const sql = `UPDATE users SET ${campos.join(", ")} WHERE id_user = ?`;
-    params.push(id)
+    params.push(id);
 
     const [rows] = await db.query(sql, params);
     return rows;
-}
+};
+
 
 exports.changePsw = async (id, password) => {
     const [rows] = await db.query('UPDATE users SET password = ? WHERE id_user = ?', [password, id]);

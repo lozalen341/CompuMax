@@ -108,6 +108,8 @@ exports.getById = async (req, res) => {
  * @param {string} [req.body.name] - Nuevo nombre del usuario
  * @param {string} [req.body.lastname] - Nuevo apellido del usuario
  * @param {string} [req.body.email] - Nuevo email del usuario
+ * @param {int} [req.body.phone] - Nuevo telefono del usuario
+ * @param {string} [req.body.address] - Nueva direccion del usuario
  * @param {string} [req.body.type] - Nuevo tipo de usuario ('user' o 'admin')
  * @param {Object} res - Objeto de respuesta de Express
  * @returns {Promise<void>} Respuesta JSON con el usuario actualizado o error
@@ -252,7 +254,7 @@ exports.login = async (req, res) => {
         );
 
         return res.json({
-            message: "Login exitoso",
+            message: "Se inicio sesion correctamente",
             token,
             user: { id: usr.id_user, email: usr.email, type: usr.type }
         });

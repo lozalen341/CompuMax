@@ -8,6 +8,43 @@ function SideBar() {
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
     const closeSidebar = () => setSidebarOpen(false);
 
+    const handleLogout = async () => {
+        try {
+            const API_KEY = import.meta.env.VITE_API_KEY;
+            const token = localStorage.getItem('token');
+
+            const response = await fetch('http://localhost:3000/users/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': API_KEY,
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                // Limpiar el almacenamiento local
+                localStorage.removeItem('token');
+                localStorage.removeItem('userType');
+                localStorage.removeItem('userId');
+
+                // Redirigir a la página de inicio de sesión
+                navigate('/login');
+            } else {
+                console.error('Error al cerrar sesión:', result.error);
+            }
+        } catch (error) {
+            console.error('Error al cerrar sesión:', error);
+            // Aún así, limpiar el almacenamiento y redirigir
+            localStorage.removeItem('token');
+            localStorage.removeItem('userType');
+            localStorage.removeItem('userId');
+            navigate('/login');
+        }
+    };
+
     return (
         <>
             {/* Overlay - fuera del sidebar */}
@@ -74,7 +111,7 @@ function SideBar() {
                 </nav>
 
                 <div className="sidebarFooter">
-                    <button className="logoutBtn">Cerrar Sesión</button>
+                    <button className="logoutBtn" onClick={handleLogout}>Cerrar Sesión</button>
                 </div>
             </aside>
         </>
