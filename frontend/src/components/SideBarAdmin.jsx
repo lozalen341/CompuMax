@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import "../assets/css/SideBar.css";
 
 function SideBar() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const navigate = useNavigate();
 
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
     const closeSidebar = () => setSidebarOpen(false);

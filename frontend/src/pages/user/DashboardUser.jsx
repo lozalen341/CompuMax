@@ -8,7 +8,9 @@ function DashboardUser() {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const userId = localStorage.getItem('userId');
-    const userName = localStorage.getItem('userName') || 'Usuario';
+    const userName = localStorage.getItem('userName') || '';
+    const userLastname = localStorage.getItem('userLastname') || '';
+    const fullName = `${userName} ${userLastname}`.trim() || 'Usuario';
 
     // Fetch user's turnos
     useEffect(() => {
@@ -16,7 +18,7 @@ function DashboardUser() {
             try {
                 const token = localStorage.getItem('token');
                 const API_KEY = import.meta.env.VITE_API_KEY;
-                
+
                 const response = await fetch(`http://localhost:3000/turnos/getById/${userId}`, {
                     headers: {
                         'x-api-key': API_KEY,
@@ -29,7 +31,7 @@ function DashboardUser() {
                 }
 
                 const data = await response.json();
-                setTurnos(data.user || []);
+                setTurnos(Array.isArray(data.turno) ? data.turno : []);
             } catch (err) {
                 console.error('Error:', err);
                 setError(err.message);
@@ -38,10 +40,9 @@ function DashboardUser() {
             }
         };
 
-        if (userId) {
-            fetchTurnos();
-        }
+        if (userId) fetchTurnos();
     }, [userId]);
+
 
     // Calculate counts by status
     const getCountByStatus = (status) => {
@@ -57,8 +58,8 @@ function DashboardUser() {
     const getUpcomingTurnos = () => {
         const now = new Date();
         return turnos
-            .filter(turno => 
-                turno.status.toLowerCase() !== 'completado' && 
+            .filter(turno =>
+                turno.status.toLowerCase() !== 'completado' &&
                 new Date(turno.deliveryTime) > now
             )
             .sort((a, b) => new Date(a.deliveryTime) - new Date(b.deliveryTime))
@@ -87,17 +88,8 @@ function DashboardUser() {
             {/* Header con saludo personalizado */}
             <div className={styles.contentHeader}>
                 <div className={styles.headerLeft}>
-                    <h1 className={styles.pageTitle}>👋 ¡Hola, {userName}!</h1>
+                    <h1 className={styles.pageTitle}>👋 ¡Hola, {fullName}!</h1>
                     <p className={styles.pageSubtitle}>Bienvenido a tu panel de gestión</p>
-                </div>
-                <div className={styles.headerActions}>
-                    <button 
-                        className={styles.btnPrimary}
-                        onClick={() => navigate('/user/nuevo-turno')}
-                    >
-                        <span>+</span>
-                        <span>Nuevo Turno</span>
-                    </button>
                 </div>
             </div>
 
@@ -154,7 +146,7 @@ function DashboardUser() {
                     <h2 className={styles.sectionTitle}>📅 Próximos Turnos</h2>
                     <a href="/user/mis-turnos" className={styles.sectionLink}>Ver todos →</a>
                 </div>
-                
+
                 <div className={styles.turnosList}>
                     {upcomingTurnos.length > 0 ? (
                         upcomingTurnos.map(turno => (

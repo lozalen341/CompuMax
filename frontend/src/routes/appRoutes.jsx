@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
+import { Navigate } from "react-router-dom";
 
 // Páginas públicas
 import LandingPage from '../pages/LandingPage';
@@ -25,29 +26,54 @@ import Perfil from '../pages/user/Perfil';
 export default function AppRouter() {
     const location = useLocation();
 
+    function AdminRoute({ children }) {
+        const type = localStorage.getItem("userType");
+        const token = localStorage.getItem("token");
+        return token && type === "0" ? children : <Navigate to="/login" replace />;
+    }
+
+    function UserRoute({ children }) {
+        const type = localStorage.getItem("userType");
+        const token = localStorage.getItem("token");
+        return token && type === "1" ? children : <Navigate to="/login" replace />;
+    }
+
+    function AuthRoute({ children }) {
+        const token = localStorage.getItem("token");
+        if (token) {
+            const type = localStorage.getItem("userType");
+            return type === "0" ? <Navigate to="/admin" replace /> : <Navigate to="/user" replace />;
+        }
+        return children;
+    }
+
+
+
     return (
         <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
 
                 {/* Públicas */}
-                <Route path="/" element={<LandingPage/>} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
+                <Route path="/register" element={<AuthRoute><Register /></AuthRoute>} />
 
                 {/* Admin */}
-                <Route path="/admin" element={<AdminLayout />}>
-                    {/* dashboard */}
+                <Route path="/admin"
+                    element={
+                        <AdminRoute>
+                            <AdminLayout />
+                        </AdminRoute>
+                    }
+                >
                     <Route index element={<DashboardAdmin />} />
-
-                    {/* gestion de turnos */}
                     <Route path="turnos" element={<GestionTurnos />} />
-
-                    {/* gestion de usuarios */}
                     <Route path="usuarios" element={<GestionUsuarios />} />
                 </Route>
 
+
                 {/* User */}
-                <Route path="/user" element={<UserLayout />}>
+                <Route path="/user" element={<UserRoute><UserLayout /></UserRoute>}>
                     {/* dashboard */}
                     <Route index element={<DashboardUser />} />
 

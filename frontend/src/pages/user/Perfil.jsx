@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import styles from "../../assets/css/MiPerfil.module.css";
 
-const API_URL = "http://localhost:3000"; // Ajusta según tu configuración
+const API_URL = "http://localhost:3000";
 
 function MiPerfil() {
     const id = localStorage.getItem('userId');
@@ -28,7 +28,9 @@ function MiPerfil() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const API_KEY = import.meta.env.VITE_API_KEY
+                const API_KEY = import.meta.env.VITE_API_KEY;
+
+                // FETCH USUARIO
                 const res = await fetch(`${API_URL}/user/getById/${id}`, {
                     method: 'GET',
                     headers: {
@@ -37,6 +39,7 @@ function MiPerfil() {
                     }
                 });
 
+                // FETCH TURNOS DEL USUARIO
                 const tickets = await fetch(`${API_URL}/turnos/getById/${id}`, {
                     method: 'GET',
                     headers: {
@@ -45,24 +48,26 @@ function MiPerfil() {
                     }
                 });
 
+                const data = await res.json();
                 const ticketData = await tickets.json();
 
-                const data = await res.json();
-                
+                // EL ENDPOINT DEVUELVE { ok: true, turno: [] }
+                const turnos = ticketData.turno || [];
+
                 if (data.ok) {
                     setUserData({
-                        name: data.user[0].name || "",
-                        lastname: data.user[0].lastname || "",
-                        email: data.user[0].email || "",
-                        phone: data.user[0].phone || "",
-                        address: data.user[0].address || "",
-                        tickets: ticketData.user.length,
-                        ticketsPending: ticketData.user.filter(ticket => ticket.status === "pendiente").length
+                        name: data.user.name || "",
+                        lastname: data.user.lastname || "",
+                        email: data.user.email || "",
+                        phone: data.user.phone || "",
+                        address: data.user.address || "",
+                        tickets: turnos.length,
+                        ticketsPending: turnos.filter(t => t.status === "pendiente").length
                     });
                 }
             } catch (error) {
-                console.error("Error al cargar los datos del usuario:", error);
-                setError("Error al cargar los datos del usuario. Por favor, intente nuevamente.");
+                console.error("Error al cargar datos:", error);
+                setError("Error al cargar los datos del usuario.");
             } finally {
                 setIsLoading(false);
             }
@@ -110,7 +115,6 @@ function MiPerfil() {
             const data = await response.json();
 
             if (response.ok) {
-                // Actualizar los datos locales con la respuesta del servidor
                 setUserData(prev => ({
                     ...prev,
                     name: data.user.name || prev.name,
@@ -119,23 +123,20 @@ function MiPerfil() {
                     phone: data.user.phone || prev.phone,
                     address: data.user.address || prev.address
                 }));
-                
-                // Mostrar mensaje de éxito
+
                 alert("Perfil actualizado correctamente");
             } else {
-                // Mostrar mensaje de error
                 throw new Error(data.message || "Error al actualizar el perfil");
             }
         } catch (error) {
-            console.error("Error al actualizar el perfil:", error);
-            alert(error.message || "Error al actualizar el perfil. Por favor, intente nuevamente.");
+            console.error(error);
+            alert(error.message || "Error al actualizar el perfil");
         }
     };
 
     const handleChangePassword = async (e) => {
         e.preventDefault();
         
-        // Validar que las contraseñas coincidan
         if (passwordData.newPassword !== passwordData.confirmPassword) {
             alert("Las contraseñas no coinciden");
             return;
@@ -161,23 +162,19 @@ function MiPerfil() {
             const data = await response.json();
 
             if (response.ok) {
-                // Limpiar el formulario
                 setPasswordData({
                     currentPassword: "",
                     newPassword: "",
                     confirmPassword: ""
                 });
                 
-                // Mostrar mensaje de éxito
                 alert("Contraseña actualizada correctamente");
             } else {
-                // Mostrar mensaje de error específico si está disponible
-                const errorMessage = data.message || "Error al actualizar la contraseña";
-                throw new Error(errorMessage);
+                throw new Error(data.message || "Error al cambiar la contraseña");
             }
         } catch (error) {
-            console.error("Error al cambiar la contraseña:", error);
-            alert(error.message || "Error al cambiar la contraseña. Por favor, intente nuevamente.");
+            console.error(error);
+            alert(error.message || "Error al cambiar la contraseña");
         }
     };
 
@@ -191,7 +188,8 @@ function MiPerfil() {
 
     return (
         <main className={styles.mainContent}>
-            {/* Header */}
+            
+            {/* HEADER */}
             <div className={styles.contentHeader}>
                 <div className={styles.headerLeft}>
                     <h1 className={styles.pageTitle}>👤 Mi Perfil</h1>
@@ -199,7 +197,7 @@ function MiPerfil() {
                 </div>
             </div>
 
-            {/* Profile Card */}
+            {/* PROFILE CARD */}
             <div className={styles.profileCard}>
                 <div className={styles.profileHeader}>
                     <div className={styles.avatarSection}>
@@ -224,7 +222,7 @@ function MiPerfil() {
                 </div>
             </div>
 
-            {/* Tabs */}
+            {/* TABS */}
             <div className={styles.tabsContainer}>
                 <div className={styles.tabs}>
                     <button
@@ -241,7 +239,7 @@ function MiPerfil() {
                     </button>
                 </div>
 
-                {/* Tab Content: Datos Personales */}
+                {/* TAB DATOS */}
                 {activeTab === "datos" && (
                     <div className={styles.tabContent}>
                         <form onSubmit={handleSaveProfile} className={styles.profileForm}>
@@ -256,6 +254,7 @@ function MiPerfil() {
                                     className={styles.formControl}
                                 />
                             </div>
+
                             <div className={styles.formGroup}>
                                 <label htmlFor="lastname">Apellido</label>
                                 <input
@@ -267,6 +266,7 @@ function MiPerfil() {
                                     className={styles.formControl}
                                 />
                             </div>
+
                             <div className={styles.formGroup}>
                                 <label htmlFor="email">Email</label>
                                 <input
@@ -274,11 +274,11 @@ function MiPerfil() {
                                     id="email"
                                     name="email"
                                     value={userData.email}
-                                    onChange={handleUserDataChange}
                                     className={styles.formControl}
                                     disabled
                                 />
                             </div>
+
                             <div className={styles.formGroup}>
                                 <label htmlFor="phone">Teléfono</label>
                                 <input
@@ -290,6 +290,7 @@ function MiPerfil() {
                                     className={styles.formControl}
                                 />
                             </div>
+
                             <div className={styles.formGroup}>
                                 <label htmlFor="address">Dirección</label>
                                 <textarea
@@ -301,6 +302,7 @@ function MiPerfil() {
                                     rows="3"
                                 ></textarea>
                             </div>
+
                             <div className={styles.formActions}>
                                 <button type="submit" className={styles.btnPrimary}>
                                     Guardar Cambios
@@ -310,7 +312,7 @@ function MiPerfil() {
                     </div>
                 )}
 
-                {/* Tab Content: Seguridad */}
+                {/* TAB SEGURIDAD */}
                 {activeTab === "seguridad" && (
                     <div className={styles.tabContent}>
                         <form onSubmit={handleChangePassword} className={styles.profileForm}>
@@ -326,6 +328,7 @@ function MiPerfil() {
                                     required
                                 />
                             </div>
+
                             <div className={styles.formGroup}>
                                 <label htmlFor="newPassword">Nueva Contraseña</label>
                                 <input
@@ -338,6 +341,7 @@ function MiPerfil() {
                                     required
                                 />
                             </div>
+
                             <div className={styles.formGroup}>
                                 <label htmlFor="confirmPassword">Confirmar Nueva Contraseña</label>
                                 <input
@@ -350,6 +354,7 @@ function MiPerfil() {
                                     required
                                 />
                             </div>
+
                             <div className={styles.formActions}>
                                 <button type="submit" className={styles.btnPrimary}>
                                     Cambiar Contraseña

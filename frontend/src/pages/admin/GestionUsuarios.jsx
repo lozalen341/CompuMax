@@ -36,7 +36,7 @@ function GestionUsuarios() {
             });
             const result = await response.json();
             console.log(result);
-            setUsuarios(result.user || []);
+            setUsuarios(result.users || []);
         } catch (error) {
             console.error("Error al obtener usuarios:", error);
             setUsuarios([]);

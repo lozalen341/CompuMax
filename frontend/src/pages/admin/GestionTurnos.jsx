@@ -2,10 +2,17 @@ import { useState, useEffect } from "react";
 import styles from "../../assets/css/GestionTurnos.module.css";
 
 function GestionTurnos() {
-    const [users, setUsers] = useState([]);
+    const [turnos, setTurnos] = useState([]);
+    const [filtroEstado, setFiltroEstado] = useState("Todos");
+    const [filtroServicio, setFiltroServicio] = useState("Todos los servicios");
+    const [filtroFecha, setFiltroFecha] = useState("Hoy");
+    const [busqueda, setBusqueda] = useState("");
+    const [modalAbierto, setModalAbierto] = useState(false);
+    const [modalEliminar, setModalEliminar] = useState(false);
+    const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
+    const [turnoAEliminar, setTurnoAEliminar] = useState(null);
 
     async function handleGetAll() {
-
         const API_KEY = import.meta.env.VITE_API_KEY;
 
         try {
@@ -18,21 +25,28 @@ function GestionTurnos() {
             });
 
             const result = await res.json();
-            setUsers(result.user);
-            console.log(result.user);
-
+            setTurnos(result.turno);
         } catch (error) {
             console.log(error);
         }
     }
 
-    const handleDelete = async (e, idTicket) => {
+    const abrirModalEliminar = (e, turno) => {
         e.preventDefault();
+        setTurnoAEliminar(turno);
+        setModalEliminar(true);
+    };
 
+    const cerrarModalEliminar = () => {
+        setModalEliminar(false);
+        setTurnoAEliminar(null);
+    };
+
+    const confirmarEliminar = async () => {
         const API_KEY = import.meta.env.VITE_API_KEY;
 
         try {
-            const res = await fetch(`http://localhost:3000/turnos/delete/${idTicket}`, {
+            await fetch(`http://localhost:3000/turnos/delete/${turnoAEliminar.id_ticket}`, {
                 method: 'DELETE',
                 headers: {
                     "Content-Type": "application/json",
@@ -40,111 +54,207 @@ function GestionTurnos() {
                 },
             });
 
-            const result = await res.json();
-            setUsers(users.filter(t => t.id_ticket !== idTicket));
+            setTurnos(turnos.filter(t => t.id_ticket !== turnoAEliminar.id_ticket));
+            cerrarModalEliminar();
 
         } catch (error) {
             console.log(error);
         }
     };
 
-    const handleEdit = async (e, ) => {
+    const handleEdit = async (e, turno) => {
         e.preventDefault();
+        setTurnoSeleccionado(turno);
+        setModalAbierto(true);
+    };
 
+    const handleCambiarEstado = async (nuevoEstado) => {
         const API_KEY = import.meta.env.VITE_API_KEY;
 
         try {
-            const res = await fetch(`http://localhost:3000/turnos/delete/${idTicket}`, {
-                method: 'DELETE',
+            const res = await fetch(`http://localhost:3000/turnos/update/${turnoSeleccionado.id_ticket}`, {
+                method: 'PUT',
                 headers: {
                     "Content-Type": "application/json",
                     "x-api-key": API_KEY
                 },
+                body: JSON.stringify({ status: nuevoEstado })
             });
 
             const result = await res.json();
-            setUsers(users.filter(t => t.id_ticket !== idTicket));
 
+            if (result.ok) {
+                setTurnos(turnos.map(t =>
+                    t.id_ticket === turnoSeleccionado.id_ticket
+                        ? { ...t, status: nuevoEstado }
+                        : t
+                ));
+
+                setTurnoSeleccionado({ ...turnoSeleccionado, status: nuevoEstado });
+
+                setTimeout(() => {
+                    setModalAbierto(false);
+                    setTurnoSeleccionado(null);
+                }, 500);
+            }
         } catch (error) {
             console.log(error);
         }
     };
 
-    const [filtroEstado, setFiltroEstado] = useState("Todos");
-    const [filtroServicio, setFiltroServicio] = useState("Todos los servicios");
-    const [filtroFecha, setFiltroFecha] = useState("Hoy");
-    const [busqueda, setBusqueda] = useState("");
+    const cerrarModal = () => {
+        setModalAbierto(false);
+        setTurnoSeleccionado(null);
+    };
+
+    // Función para obtener la clase CSS del estado
+    const getEstadoClass = (status) => {
+        const statusLower = status.toLowerCase().trim();
+        if (statusLower === "pendiente") return "pendiente";
+        if (statusLower === "en proceso" || statusLower === "en_proceso") return "en-proceso";
+        if (statusLower === "finalizado") return "finalizado";
+        if (statusLower === "cancelado") return "cancelado";
+        return "";
+    };
+
+    // Función para formatear fechas
+    const formatDate = (dateString) => {
+        return new Date(dateString).toLocaleDateString('es-ES', { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric' 
+        });
+    };
+
+    // Función para formatear horas
+    const formatTime = (dateString) => {
+        return new Date(dateString).toLocaleTimeString('es-ES', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+    };
+
+    // Mapear estados para mostrar
+    const getEstadoMostrar = (estado) => {
+        const estados = {
+            'pendiente': 'Pendiente',
+            'en_proceso': 'En Proceso',
+            'en proceso': 'En Proceso',
+            'finalizado': 'Finalizado',
+            'cancelado': 'Cancelado'
+        };
+        return estados[estado.toLowerCase()] || estado;
+    };
 
     useEffect(() => {
         handleGetAll();
     }, []);
 
+    // CONTADORES DE ESTADOS
+    const normalize = s => s?.toLowerCase().trim() ?? "";
+
+    const pendientes = turnos.filter(t => normalize(t.status) === "pendiente").length;
+    const proceso = turnos.filter(t => normalize(t.status) === "en proceso" || normalize(t.status) === "en_proceso").length;
+    const finalizados = turnos.filter(t => normalize(t.status) === "finalizado").length;
+    const cancelados = turnos.filter(t => normalize(t.status) === "cancelado").length;
+
+    // FILTROS COMPLETOS
+    const hoy = new Date();
+    const inicioSemana = new Date();
+    inicioSemana.setDate(hoy.getDate() - hoy.getDay());
+    const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+
+    const turnosFiltrados = turnos.filter(t => {
+        // ESTADO
+        if (filtroEstado !== "Todos") {
+            if (t.status.toLowerCase() !== filtroEstado.toLowerCase()) return false;
+        }
+
+        // SERVICIO
+        if (filtroServicio !== "Todos los servicios") {
+            if (t.description?.toLowerCase() !== filtroServicio.toLowerCase()) return false;
+        }
+
+        // FECHA
+        const fechaTurno = new Date(t.dateCreated);
+
+        switch (filtroFecha) {
+            case "Hoy":
+                if (fechaTurno.toDateString() !== hoy.toDateString()) return false;
+                break;
+            case "Esta semana":
+                if (fechaTurno < inicioSemana) return false;
+                break;
+            case "Este mes":
+                if (fechaTurno < inicioMes) return false;
+                break;
+        }
+
+        // BÚSQUEDA
+        const search = busqueda.toLowerCase();
+        if (search) {
+            if (
+                !t.description.toLowerCase().includes(search) &&
+                !String(t.id_user).includes(search) &&
+                !String(t.id_ticket).includes(search)
+            ) return false;
+        }
+
+        return true;
+    });
+
     return (
         <main className={styles.mainContent}>
-            {/* Header con degradado */}
+            {/* Header */}
             <div className={styles.contentHeader}>
                 <div className={styles.headerLeft}>
                     <h1 className={styles.pageTitle}>📅 Gestión de Turnos</h1>
                     <p className={styles.pageSubtitle}>Administra y organiza todas las citas</p>
                 </div>
                 <div className={styles.headerActions}>
-                    <div className={styles.searchBox}>
-                        <span className={styles.searchIcon}></span>
-                        <input
-                            type="text"
-                            className={styles.searchInput}
-                            placeholder="Buscar por cliente, servicio..."
-                            value={busqueda}
-                            onChange={(e) => setBusqueda(e.target.value)}
-                        />
-                    </div>
-                    <button className={styles.btnPrimary}>
-                        <span>+</span>
-                        <span>Nuevo Turno</span>
-                    </button>
                 </div>
             </div>
 
-            {/* Stats Grid - Estilo Calendario/Timeline */}
+            {/* Stats Grid */}
             <div className={styles.statsGrid}>
                 <div className={`${styles.statCard} ${styles.statPending}`}>
                     <div className={styles.statIcon}>⏳</div>
                     <div className={styles.statContent}>
-                        <h3>1</h3>
+                        <h3>{pendientes}</h3>
                         <p>Turnos Pendientes</p>
-                        <span className={styles.statTrend}>↑ 1 desde ayer</span>
+                        <span className={styles.statTrend}>→ Actualizado</span>
                     </div>
                 </div>
 
                 <div className={`${styles.statCard} ${styles.statProcess}`}>
                     <div className={styles.statIcon}>🔧</div>
                     <div className={styles.statContent}>
-                        <h3>0</h3>
+                        <h3>{proceso}</h3>
                         <p>En Proceso</p>
-                        <span className={styles.statTrend}>→ Sin cambios</span>
+                        <span className={styles.statTrend}>→ Actualizado</span>
                     </div>
                 </div>
 
                 <div className={`${styles.statCard} ${styles.statCompleted}`}>
                     <div className={styles.statIcon}>✓</div>
                     <div className={styles.statContent}>
-                        <h3>0</h3>
-                        <p>Finalizados Hoy</p>
-                        <span className={styles.statTrend}>→ Sin cambios</span>
+                        <h3>{finalizados}</h3>
+                        <p>Finalizados</p>
+                        <span className={styles.statTrend}>→ Actualizado</span>
                     </div>
                 </div>
 
                 <div className={`${styles.statCard} ${styles.statRevenue}`}>
                     <div className={styles.statIcon}>💰</div>
                     <div className={styles.statContent}>
-                        <h3>$0</h3>
-                        <p>Ingresos del Mes</p>
-                        <span className={styles.statTrend}>→ Sin cambios</span>
+                        <h3>{cancelados}</h3>
+                        <p>Cancelados</p>
+                        <span className={styles.statTrend}>→ Actualizado</span>
                     </div>
                 </div>
             </div>
 
-            {/* Filters Bar - Estilo Inline más compacto */}
+            {/* Filters */}
             <div className={styles.filtersBar}>
                 <div className={styles.filterGroup}>
                     <label className={styles.filterLabel}>📊 Estado</label>
@@ -189,21 +299,14 @@ function GestionTurnos() {
                         <option>Personalizado</option>
                     </select>
                 </div>
-
-                <button className={styles.btnExport}>📥 Exportar</button>
             </div>
 
-            {/* Data Table - Estilo Timeline */}
+            {/* Tabla */}
             <div className={styles.dataTableContainer}>
                 <div className={styles.tableHeader}>
                     <h2 className={styles.tableTitle}>📋 Lista de Turnos</h2>
-                    <div className={styles.tableActions}>
-                        <button className={styles.btnView}>Vista Calendario</button>
-                        <button className={styles.btnView}>Vista Lista</button>
-                    </div>
                 </div>
 
-                {/* Vista Desktop - Tabla */}
                 <div className={styles.desktopView}>
                     <div className={styles.tableWrapper}>
                         <table className={styles.dataTable}>
@@ -218,81 +321,206 @@ function GestionTurnos() {
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
-                                <tbody>
-                                {users.map((t) => (
+                            <tbody>
+                                {turnosFiltrados.map((t) => (
                                     <tr key={t.id_ticket}>
-                                    <td>{t.id_ticket}</td>
-                                    <td>{t.id_user}</td>
-                                    <td>{t.description}</td>
-                                    <td>{new Date(t.dateCreated).toLocaleDateString()}</td>
-                                    <td>{new Date(t.deliveryTime).toLocaleTimeString()}</td>
-                                    <td>
-                                        <span className={`${styles.statusBadge} ${styles[t.status.replace(' ', '-')]}`}>
-                                        {t.status}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div className={styles.actionButtons}>
-                                            <button className={`${styles.btnAction} ${styles.btnView}`} title="Ver">👁️</button>
-                                            <button className={`${styles.btnAction} ${styles.btnEdit}`} title="Editar">✏️</button>
-                                            <button className={`${styles.btnAction} ${styles.btnDelete}`} title="Eliminar" onClick={(e) => handleDelete(e, t.id_ticket)}>🗑️</button>
-                                        </div>
-                                    </td>
+                                        <td>{t.id_ticket}</td>
+                                        <td>{t.id_user}</td>
+                                        <td>{t.description}</td>
+                                        <td>{new Date(t.dateCreated).toLocaleDateString()}</td>
+                                        <td>{new Date(t.deliveryTime).toLocaleTimeString()}</td>
+                                        <td>
+                                            <span className={`${styles.statusBadge} ${styles[getEstadoClass(t.status)]}`}>
+                                                {t.status}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div className={styles.actionButtons}>
+                                                <button
+                                                    className={`${styles.btnAction} ${styles.btnEdit}`}
+                                                    title="Editar"
+                                                    onClick={(e) => handleEdit(e, t)}
+                                                >
+                                                    ✏️
+                                                </button>
+                                                <button
+                                                    className={`${styles.btnAction} ${styles.btnDelete}`}
+                                                    title="Eliminar"
+                                                    onClick={(e) => abrirModalEliminar(e, t)}
+                                                >
+                                                    🗑️
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
                                 ))}
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </div>
 
-                {/* Vista Mobile - Cards */}
+                {/* Mobile */}
                 <div className={styles.mobileView}>
-                {users.map((t) => (
-                    <div key={t.id_ticket} className={styles.turnoCard}>
-                    <div className={styles.cardHeader}>
-                        <div className={styles.cardHeaderLeft}>
-                        <div className={styles.avatar}>{t.id_user}</div>
-                        <div className={styles.cardInfo}>
-                            <h3 className={styles.cardCliente}>{t.description}</h3>
-                            <span className={styles.cardId}>{t.id_ticket}</span>
-                        </div>
-                        </div>
-                        <span className={`${styles.statusBadge} ${styles[t.status.replace(' ', '-')]}`}>
-                        {t.status}
-                        </span>
-                    </div>
+                    {turnosFiltrados.map((t) => (
+                        <div key={t.id_ticket} className={styles.turnoCard}>
+                            <div className={styles.cardHeader}>
+                                <div className={styles.cardHeaderLeft}>
+                                    <div className={styles.avatar}>{t.id_user}</div>
+                                    <div className={styles.cardInfo}>
+                                        <h3 className={styles.cardCliente}>{t.description}</h3>
+                                        <span className={styles.cardId}>{t.id_ticket}</span>
+                                    </div>
+                                </div>
+                                <span className={`${styles.statusBadge} ${styles[getEstadoClass(t.status)]}`}>
+                                    {t.status}
+                                </span>
+                            </div>
 
-                    <div className={styles.cardBody}>
-                        <div className={styles.cardDetail}>
-                        <span className={styles.cardLabel}>📆 Fecha:</span>
-                        <span className={styles.cardValue}>{new Date(t.dateCreated).toLocaleDateString()}</span>
-                        </div>
-                        <div className={styles.cardDetail}>
-                        <span className={styles.cardLabel}>⏰ Hora:</span>
-                        <span className={styles.cardValue}>{new Date(t.deliveryTime).toLocaleTimeString()}</span>
-                        </div>
-                    </div>
+                            <div className={styles.cardBody}>
+                                <div className={styles.cardDetail}>
+                                    <span className={styles.cardLabel}>📆 Fecha:</span>
+                                    <span className={styles.cardValue}>{new Date(t.dateCreated).toLocaleDateString()}</span>
+                                </div>
+                                <div className={styles.cardDetail}>
+                                    <span className={styles.cardLabel}>⏰ Hora:</span>
+                                    <span className={styles.cardValue}>{new Date(t.deliveryTime).toLocaleTimeString()}</span>
+                                </div>
+                            </div>
 
-                    <div className={styles.cardFooter}>
-                        <button className={`${styles.btnAction} ${styles.btnView}`} title="Ver">👁️ Ver</button>
-                        <button className={`${styles.btnAction} ${styles.btnEdit}`} title="Editar">✏️ Editar</button>
-                        <button className={`${styles.btnAction} ${styles.btnDelete}`} title="Eliminar">🗑️ Eliminar</button>
-                    </div>
-                    </div>
-                ))}
-                </div>
-
-                <div className={styles.pagination}>
-                    <div className={styles.paginationInfo}>
-                        Mostrando 1-1 de 1 turno
-                    </div>
-                    <div className={styles.paginationButtons}>
-                        <button className={styles.pageBtn} disabled>‹ Anterior</button>
-                        <button className={`${styles.pageBtn} ${styles.active}`}>1</button>
-                        <button className={styles.pageBtn} disabled>Siguiente ›</button>
-                    </div>
+                            <div className={styles.cardFooter}>
+                                <button
+                                    className={`${styles.btnAction} ${styles.btnEdit}`}
+                                    onClick={(e) => handleEdit(e, t)}
+                                >
+                                    ✏️ Editar
+                                </button>
+                                <button
+                                    className={`${styles.btnAction} ${styles.btnDelete}`}
+                                    onClick={(e) => abrirModalEliminar(e, t)}
+                                >
+                                    🗑️ Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
+
+            {/* Modal de cambio de estado */}
+            {modalAbierto && turnoSeleccionado && (
+                <div className={styles.modalOverlay} onClick={cerrarModal}>
+                    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <h2 className={styles.modalTitle}>✏️ Cambiar Estado del Turno</h2>
+                            <button className={styles.modalClose} onClick={cerrarModal}>×</button>
+                        </div>
+
+                        <div className={styles.modalBody}>
+                            <div className={styles.turnoInfo}>
+                                <p><strong>ID Turno:</strong> {turnoSeleccionado.id_ticket}</p>
+                                <p><strong>Cliente:</strong> {turnoSeleccionado.id_user}</p>
+                                <p><strong>Servicio:</strong> {turnoSeleccionado.description}</p>
+                                <p><strong>Estado actual:</strong>
+                                    <span className={`${styles.statusBadge} ${styles[getEstadoClass(turnoSeleccionado.status)]}`}>
+                                        {turnoSeleccionado.status}
+                                    </span>
+                                </p>
+                            </div>
+
+                            <div className={styles.estadosGrid}>
+                                <button
+                                    className={`${styles.estadoBtn} ${styles.estadoPendiente}`}
+                                    onClick={() => handleCambiarEstado('Pendiente')}
+                                    disabled={turnoSeleccionado.status === 'Pendiente'}
+                                >
+                                    <span className={styles.estadoIcon}>⏳</span>
+                                    <span className={styles.estadoTexto}>Pendiente</span>
+                                </button>
+
+                                <button
+                                    className={`${styles.estadoBtn} ${styles.estadoProceso}`}
+                                    onClick={() => handleCambiarEstado('En Proceso')}
+                                    disabled={turnoSeleccionado.status === 'En Proceso'}
+                                >
+                                    <span className={styles.estadoIcon}>🔧</span>
+                                    <span className={styles.estadoTexto}>En Proceso</span>
+                                </button>
+
+                                <button
+                                    className={`${styles.estadoBtn} ${styles.estadoFinalizado}`}
+                                    onClick={() => handleCambiarEstado('Finalizado')}
+                                    disabled={turnoSeleccionado.status === 'Finalizado'}
+                                >
+                                    <span className={styles.estadoIcon}>✓</span>
+                                    <span className={styles.estadoTexto}>Finalizado</span>
+                                </button>
+
+                                <button
+                                    className={`${styles.estadoBtn} ${styles.estadoCancelado}`}
+                                    onClick={() => handleCambiarEstado('Cancelado')}
+                                    disabled={turnoSeleccionado.status === 'Cancelado'}
+                                >
+                                    <span className={styles.estadoIcon}>✕</span>
+                                    <span className={styles.estadoTexto}>Cancelado</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className={styles.modalFooter}>
+                            <button className={styles.btnCancelar} onClick={cerrarModal}>
+                                Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal de confirmación de eliminación */}
+            {modalEliminar && turnoAEliminar && (
+                <div className={styles.modalOverlay} onClick={cerrarModalEliminar}>
+                    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <h2 className={styles.modalTitle}>⚠️ Confirmar Eliminación</h2>
+                            <button className={styles.modalClose} onClick={cerrarModalEliminar}>×</button>
+                        </div>
+
+                        <div className={styles.modalBody}>
+                            <div className={styles.warningBox}>
+                                <div className={styles.warningIcon}>🗑️</div>
+                                <p className={styles.warningText}>
+                                    ¿Estás seguro de que deseas eliminar este turno?
+                                </p>
+                            </div>
+
+                            <div className={styles.turnoInfo}>
+                                <p><strong>ID Turno:</strong> {turnoAEliminar.id_ticket}</p>
+                                <p><strong>Cliente:</strong> {turnoAEliminar.id_user}</p>
+                                <p><strong>Servicio:</strong> {turnoAEliminar.description}</p>
+                                <p><strong>Fecha:</strong> {formatDate(turnoAEliminar.dateCreated)}</p>
+                                <p><strong>Hora:</strong> {formatTime(turnoAEliminar.deliveryTime)}</p>
+                                <p><strong>Estado:</strong>
+                                    <span className={`${styles.statusBadge} ${styles[getEstadoClass(turnoAEliminar.status)]}`}>
+                                        {getEstadoMostrar(turnoAEliminar.status)}
+                                    </span>
+                                </p>
+                            </div>
+
+                            <div className={styles.alertMessage}>
+                                <strong>⚠️ Advertencia:</strong> Esta acción no se puede deshacer.
+                            </div>
+                        </div>
+
+                        <div className={styles.modalFooter}>
+                            <button className={styles.btnCancelar} onClick={cerrarModalEliminar}>
+                                Cancelar
+                            </button>
+                            <button className={styles.btnEliminar} onClick={confirmarEliminar}>
+                                Eliminar Turno
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }
