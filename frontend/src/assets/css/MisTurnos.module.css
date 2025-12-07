@@ -318,7 +318,13 @@
     font-weight: 600;
 }
 
+/* ============================================
+   CORRECCIÓN DE ESTADOS - COLORES
+   ============================================ */
+
+/* Sobrescribir estilos de badges para consistencia */
 .statusBadge {
+    display: inline-block;
     padding: 0.5rem 1rem;
     border-radius: 20px;
     font-size: 0.85rem;
@@ -350,6 +356,284 @@
     background: rgba(239, 68, 68, 0.15);
     color: #EF4444;
     border: 2px solid #EF4444;
+}
+
+/* ============================================
+   MODAL DE CONFIRMACIÓN DE CANCELACIÓN
+   ============================================ */
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modalContent {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease-out;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modalTitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+.modalClose {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #9ca3af;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.modalClose:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+.modalBody {
+    padding: 24px;
+}
+
+.warningBox {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.warningIcon {
+    font-size: 3.5rem;
+    margin-bottom: 12px;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.warningText {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #92400e;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.turnoInfo {
+    background: #f9fafb;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.turnoInfo p {
+    margin: 8px 0;
+    color: #4b5563;
+    font-size: 0.95rem;
+}
+
+.turnoInfo strong {
+    color: #1f2937;
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+.alertMessage {
+    background: #fee2e2;
+    border-left: 4px solid #ef4444;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: #991b1b;
+    font-size: 0.9rem;
+}
+
+.alertMessage strong {
+    font-weight: 700;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.modalFooter {
+    padding: 20px 24px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btnCancelar {
+    padding: 10px 20px;
+    background: #f3f4f6;
+    color: #4b5563;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+.btnCancelar:hover {
+    background: #e5e7eb;
+}
+
+.btnEliminar {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btnEliminar:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+    transform: translateY(-2px);
+}
+
+.btnEliminar:active {
+    transform: translateY(0);
+}
+
+/* ============================================
+   MENSAJE DE FEEDBACK/ALERTA
+   ============================================ */
+
+.messageAlert {
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.messageAlert.success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 2px solid #10b981;
+}
+
+.messageAlert.error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 2px solid #ef4444;
+}
+
+/* ============================================
+   RESPONSIVE - MODAL
+   ============================================ */
+
+@media (max-width: 768px) {
+    .modalContent {
+        width: 95%;
+        margin: 20px;
+    }
+    
+    .modalHeader {
+        padding: 20px;
+    }
+    
+    .modalTitle {
+        font-size: 1.25rem;
+    }
+    
+    .modalBody {
+        padding: 20px;
+    }
+    
+    .warningBox {
+        padding: 20px;
+    }
+    
+    .warningIcon {
+        font-size: 3rem;
+    }
+    
+    .warningText {
+        font-size: 1rem;
+    }
+    
+    .modalFooter {
+        flex-direction: column-reverse;
+        gap: 8px;
+    }
+    
+    .modalFooter button {
+        width: 100%;
+    }
 }
 
 .cardFooter {

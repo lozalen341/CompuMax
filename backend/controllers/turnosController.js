@@ -13,7 +13,7 @@ exports.getAllTurnos = async (req, res) => {
     try {
         const turnos = await Turnos.getAll();
 
-        res.json({ ok: true, user: turnos });
+        res.json({ ok: true, turno: turnos });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -35,7 +35,7 @@ exports.getAllById = async (req, res) => {
         const id_user = req.params.id_user;
         const turnos = await Turnos.getById(id_user);
 
-        res.json({ ok: true, user: turnos });
+        res.json({ ok: true, turno: turnos });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -68,7 +68,7 @@ exports.createTurno = async (req, res) => {
             description
         );
         
-        res.json({ ok: true, user: create });
+        res.json({ ok: true, turno: create });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -95,7 +95,7 @@ exports.updateTurno = async (req, res) => {
         const datos = req.body;
 
         const update = await Turnos.updateTurno(id_ticket, datos);
-        res.json({ ok: true, user: update });
+        res.json({ ok: true, turno: update });
 
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -118,7 +118,7 @@ exports.deleteTurno = async (req, res) => {
         const id_ticket = req.params.id_ticket;
         const deleteTurn = await Turnos.deleteTurno(id_ticket);
 
-        res.json({ ok: true, user: deleteTurn });
+        res.json({ ok: true, turno: deleteTurn });
 
     } catch (error) {
         res.status(500).json({ error: error.message });

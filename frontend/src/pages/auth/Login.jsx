@@ -29,15 +29,21 @@ function Login() {
             });
 
             const result = await res.json();
-            console.log(result);
 
             if (res.status === 200) {
                 setMsg(result.message);
                 setMsgType("success");
 
+                console.log("Usuario recibido:", result.user);
                 localStorage.setItem("token", result.token);
                 localStorage.setItem("userType", result.user.type);
                 localStorage.setItem("userId", result.user.id);
+                localStorage.setItem("userName", result.user.name);
+                localStorage.setItem("userLastname", result.user.lastname);
+                console.log("Guardado en localStorage:", {
+                    userName: localStorage.getItem("userName"),
+                    userLastname: localStorage.getItem("userLastname")
+                });
                 
                 setTimeout(() => {
                     if (result.user.type === 0) navigate("/admin");

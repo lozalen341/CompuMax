@@ -10,6 +10,9 @@ function MisTurnos() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [message, setMessage] = useState({ text: "", type: "" });
+    const [cancelingId, setCancelingId] = useState(null);
+    const [modalEliminar, setModalEliminar] = useState(false);
+    const [turnoAEliminar, setTurnoAEliminar] = useState(null);
 
     // Función para formatear fechas
     const formatDate = (dateString) => {
@@ -23,20 +26,32 @@ function MisTurnos() {
         return new Date(dateString).toLocaleTimeString('es-ES', options);
     };
 
-    const [cancelingId, setCancelingId] = useState(null);
+    // Función para obtener la clase CSS del estado
+    const getEstadoClass = (status) => {
+        const statusLower = status.toLowerCase().trim();
+        if (statusLower === "pendiente") return "pendiente";
+        if (statusLower === "en proceso" || statusLower === "en_proceso") return "en-proceso";
+        if (statusLower === "finalizado") return "finalizado";
+        if (statusLower === "cancelado") return "cancelado";
+        return "";
+    };
 
-    const handleCancelarTurno = async (idTurno) => {
-        if (!window.confirm('¿Estás seguro de que deseas cancelar este turno?')) {
-            return;
-        }
+    const abrirModalEliminar = (turno) => {
+        setTurnoAEliminar(turno);
+        setModalEliminar(true);
+    };
 
-        setCancelingId(idTurno);
+    const cerrarModalEliminar = () => {
+        setModalEliminar(false);
+        setTurnoAEliminar(null);
+    };
 
+    const confirmarEliminar = async () => {
         try {
             const token = localStorage.getItem('token');
             const API_KEY = import.meta.env.VITE_API_KEY;
             
-            const response = await fetch(`http://localhost:3000/turnos/delete/${idTurno}`, {
+            const response = await fetch(`http://localhost:3000/turnos/delete/${turnoAEliminar.id_ticket}`, {
                 method: 'DELETE',
                 headers: {
                     'x-api-key': API_KEY,
@@ -54,8 +69,11 @@ function MisTurnos() {
                 type: 'success'
             });
             
-            // Recargar la lista de turnos
             await fetchTurnos();
+            cerrarModalEliminar();
+            
+            // Limpiar mensaje después de 3 segundos
+            setTimeout(() => setMessage({ text: "", type: "" }), 3000);
             
         } catch (error) {
             console.error('Error al cancelar el turno:', error);
@@ -63,8 +81,7 @@ function MisTurnos() {
                 text: error.message || 'Error al cancelar el turno',
                 type: 'error'
             });
-        } finally {
-            setCancelingId(null);
+            cerrarModalEliminar();
         }
     };
 
@@ -91,7 +108,7 @@ function MisTurnos() {
             }
 
             const data = await response.json();
-            setTurnos(data.user || []);
+            setTurnos(data.turno || []);
         } catch (err) {
             console.error('Error:', err);
             setError(err.message || 'Error al cargar los turnos');
@@ -100,7 +117,6 @@ function MisTurnos() {
         }
     };
 
-    // Cargar los turnos al montar el componente
     useEffect(() => {
         fetchTurnos();
     }, []);
@@ -115,11 +131,12 @@ function MisTurnos() {
     });
 
     // Calcular estadísticas
+    const normalize = s => s?.toLowerCase().trim() ?? "";
     const stats = {
         total: turnos.length,
-        pendientes: turnos.filter(t => t.status.toLowerCase() === 'pendiente').length,
-        enProceso: turnos.filter(t => t.status.toLowerCase() === 'en_proceso').length,
-        finalizados: turnos.filter(t => t.status.toLowerCase() === 'finalizado').length
+        pendientes: turnos.filter(t => normalize(t.status) === 'pendiente').length,
+        enProceso: turnos.filter(t => normalize(t.status) === 'en proceso' || normalize(t.status) === 'en_proceso').length,
+        finalizados: turnos.filter(t => normalize(t.status) === 'finalizado').length
     };
 
     // Mapear estados del backend a estados para mostrar
@@ -127,10 +144,11 @@ function MisTurnos() {
         const estados = {
             'pendiente': 'Pendiente',
             'en_proceso': 'En Proceso',
+            'en proceso': 'En Proceso',
             'finalizado': 'Finalizado',
             'cancelado': 'Cancelado'
         };
-        return estados[estado] || estado;
+        return estados[estado.toLowerCase()] || estado;
     };
 
     // Mapear íconos según el servicio
@@ -191,6 +209,13 @@ function MisTurnos() {
                 </div>
             </div>
 
+            {/* Mensaje de feedback */}
+            {message.text && (
+                <div className={`${styles.messageAlert} ${styles[message.type]}`}>
+                    {message.text}
+                </div>
+            )}
+
             {/* Stats Grid */}
             <div className={styles.statsGrid}>
                 <div className={`${styles.statCard} ${styles.statPending}`}>
@@ -247,7 +272,7 @@ function MisTurnos() {
                     >
                         <option value="Todos">Todos los Estados</option>
                         <option value="pendiente">Pendiente</option>
-                        <option value="en_proceso">En Proceso</option>
+                        <option value="en proceso">En Proceso</option>
                         <option value="finalizado">Finalizado</option>
                         <option value="cancelado">Cancelado</option>
                     </select>
@@ -275,7 +300,7 @@ function MisTurnos() {
                                 <div key={turno.id_ticket} className={styles.turnoCard}>
                                     <div className={styles.cardHeader}>
                                         <div className={styles.cardIcon}>{icono}</div>
-                                        <span className={`${styles.statusBadge} ${styles[turno.status]}`}>
+                                        <span className={`${styles.statusBadge} ${styles[getEstadoClass(turno.status)]}`}>
                                             {estadoMostrar}
                                         </span>
                                     </div>
@@ -305,25 +330,15 @@ function MisTurnos() {
                                     </div>
 
                                     <div className={styles.cardFooter}>
-                                        {turno.status === 'pendiente' && (
+                                        {(turno.status.toLowerCase() === 'pendiente') && (
                                             <button 
                                                 className={`${styles.btnAction} ${styles.btnCancel}`}
-                                                onClick={() => handleCancelarTurno(turno.id_ticket)}
-                                                disabled={cancelingId === turno.id_ticket}
+                                                onClick={() => abrirModalEliminar(turno)}
                                             >
-                                                {cancelingId === turno.id_ticket ? (
-                                                    'Cancelando...'
-                                                ) : (
-                                                    '❌ Cancelar'
-                                                )}
+                                                ❌ Cancelar
                                             </button>
                                         )}
                                     </div>
-                                    {message.text && (
-                                            <div className={`${styles.message} ${message.type === 'error' ? styles.error : styles.success}`}>
-                                                {message.text}
-                                            </div>
-                                        )}
                                 </div>
                             );
                         })}
@@ -362,6 +377,52 @@ function MisTurnos() {
                     </div>
                 )}
             </div>
+
+            {/* Modal de confirmación de eliminación */}
+            {modalEliminar && turnoAEliminar && (
+                <div className={styles.modalOverlay} onClick={cerrarModalEliminar}>
+                    <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <h2 className={styles.modalTitle}>⚠️ Confirmar Cancelación</h2>
+                            <button className={styles.modalClose} onClick={cerrarModalEliminar}>×</button>
+                        </div>
+                        
+                        <div className={styles.modalBody}>
+                            <div className={styles.warningBox}>
+                                <div className={styles.warningIcon}>🗑️</div>
+                                <p className={styles.warningText}>
+                                    ¿Estás seguro de que deseas cancelar este turno?
+                                </p>
+                            </div>
+
+                            <div className={styles.turnoInfo}>
+                                <p><strong>ID Turno:</strong> #{turnoAEliminar.id_ticket}</p>
+                                <p><strong>Servicio:</strong> {turnoAEliminar.description}</p>
+                                <p><strong>Fecha:</strong> {formatDate(turnoAEliminar.deliveryTime)}</p>
+                                <p><strong>Hora:</strong> {formatTime(turnoAEliminar.deliveryTime)}</p>
+                                <p><strong>Estado:</strong> 
+                                    <span className={`${styles.statusBadge} ${styles[getEstadoClass(turnoAEliminar.status)]}`}>
+                                        {getEstadoMostrar(turnoAEliminar.status)}
+                                    </span>
+                                </p>
+                            </div>
+
+                            <div className={styles.alertMessage}>
+                                <strong>⚠️ Advertencia:</strong> Esta acción no se puede deshacer.
+                            </div>
+                        </div>
+
+                        <div className={styles.modalFooter}>
+                            <button className={styles.btnCancelar} onClick={cerrarModalEliminar}>
+                                No, mantener turno
+                            </button>
+                            <button className={styles.btnEliminar} onClick={confirmarEliminar}>
+                                Sí, cancelar turno
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }

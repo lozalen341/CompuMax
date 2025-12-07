@@ -1,7 +1,6 @@
 const Users = require("../models/userModel");
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 /**
  * Crea un nuevo usuario en el sistema
@@ -24,7 +23,8 @@ exports.createUser = async (req, res) => {
 
         if (type === "user") type = 1;
         else if (type === "admin") type = 0;
-        else return res.status(400).json({ error: "El tipo de usuario no es válido" });
+        else
+            return res.status(400).json({ error: "El tipo de usuario no es válido" });
 
         // verificar si ya existe el mail
         const existingUser = await Users.getByEmail(email);
@@ -47,16 +47,15 @@ exports.createUser = async (req, res) => {
         return res.status(201).json({
             ok: true,
             message: "Usuario creado correctamente",
-            user: create
+            user: create,
         });
     } catch (error) {
         console.log("Error en createUser:", error);
         return res.status(500).json({
-            error: "Error interno del servidor"
+            error: "Error interno del servidor",
         });
     }
 };
-
 
 /**
  * Obtiene todos los usuarios del sistema
@@ -69,8 +68,8 @@ exports.createUser = async (req, res) => {
  */
 exports.getAllUsers = async (req, res) => {
     try {
-        const user = await Users.getAll();
-        res.json({ ok: true, user: user });
+        const users = await Users.getAll();
+        res.json({ ok: true, users });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -91,7 +90,13 @@ exports.getById = async (req, res) => {
     try {
         const id_user = req.params.id;
         const user = await Users.getById(id_user);
-        res.json({ ok: true, user: user });
+
+        if (!user || user.length === 0)
+            return res
+                .status(404)
+                .json({ ok: false, error: "Usuario no encontrado" });
+
+        res.json({ ok: true, user: user[0] });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -128,7 +133,9 @@ exports.updateUser = async (req, res) => {
             } else if (type === "admin") {
                 type = 0;
             } else {
-                return res.status(400).json({ error: "El tipo de usuario no es válido" });
+                return res
+                    .status(400)
+                    .json({ error: "El tipo de usuario no es válido" });
             }
 
             datos.type = type;
@@ -170,7 +177,9 @@ exports.changePsw = async (req, res) => {
         // Verificar que la contraseña actual es correcta
         const valid = await bcrypt.compare(currentPassword, user[0].password);
         if (!valid) {
-            return res.status(401).json({ error: "La contraseña actual es incorrecta" });
+            return res
+                .status(401)
+                .json({ error: "La contraseña actual es incorrecta" });
         }
 
         // Encriptar la nueva contraseña
@@ -221,7 +230,9 @@ exports.login = async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(401).json({ error: "Es necesario el email y la contraseña" });
+            return res
+                .status(401)
+                .json({ error: "Es necesario el email y la contraseña" });
         }
 
         const user = await Users.login(email);
@@ -239,7 +250,9 @@ exports.login = async (req, res) => {
         }
 
         if (!usr.password) {
-            return res.status(500).json({ error: "Error interno: usuario sin contraseña" });
+            return res
+                .status(500)
+                .json({ error: "Error interno: usuario sin contraseña" });
         }
 
         const valid = await bcrypt.compare(password, usr.password);
@@ -256,9 +269,8 @@ exports.login = async (req, res) => {
         return res.json({
             message: "Se inicio sesion correctamente",
             token,
-            user: { id: usr.id_user, email: usr.email, type: usr.type }
+            user: { id: usr.id_user, email: usr.email, type: usr.type, name: usr.name, lastname: usr.lastname },
         });
-
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: error.message });
@@ -274,17 +286,15 @@ exports.login = async (req, res) => {
  */
 exports.logout = (req, res) => {
     try {
-        // En una implementación con tokens, aquí podríamos invalidar el token si es necesario
-        // Por ahora, simplemente devolvemos una respuesta exitosa
         return res.status(200).json({
             ok: true,
-            message: 'Sesión cerrada correctamente'
+            message: "Sesión cerrada correctamente",
         });
     } catch (error) {
-        console.error('Error en logout:', error);
+        console.error("Error en logout:", error);
         return res.status(500).json({
             ok: false,
-            error: 'Error al cerrar sesión'
+            error: "Error al cerrar sesión",
         });
     }
 };
