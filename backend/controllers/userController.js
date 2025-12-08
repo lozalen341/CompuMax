@@ -19,7 +19,7 @@ const bcrypt = require("bcrypt");
  */
 exports.createUser = async (req, res) => {
     try {
-        let { name, lastname, email, type, password } = req.body;
+    let { name, lastname, email, type, password, phone } = req.body;
 
         if (type === "user") type = 1;
         else if (type === "admin") type = 0;
@@ -41,7 +41,8 @@ exports.createUser = async (req, res) => {
             lastname,
             email,
             type,
-            hashedPassword
+            hashedPassword,
+            phone
         );
 
         return res.status(201).json({

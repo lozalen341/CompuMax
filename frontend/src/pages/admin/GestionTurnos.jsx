@@ -6,6 +6,8 @@ function GestionTurnos() {
     const [filtroEstado, setFiltroEstado] = useState("Todos");
     const [filtroServicio, setFiltroServicio] = useState("Todos los servicios");
     const [filtroFecha, setFiltroFecha] = useState("Hoy");
+    const [filtroDesde, setFiltroDesde] = useState("");
+    const [filtroHasta, setFiltroHasta] = useState("");
     const [busqueda, setBusqueda] = useState("");
     const [modalAbierto, setModalAbierto] = useState(false);
     const [modalEliminar, setModalEliminar] = useState(false);
@@ -72,25 +74,29 @@ function GestionTurnos() {
         const API_KEY = import.meta.env.VITE_API_KEY;
 
         try {
+            // Convertir el estado mostrado al formato que usa la BD (ej. 'En Proceso' -> 'en_proceso')
+            const dbStatus = displayToDb(nuevoEstado);
+
             const res = await fetch(`http://localhost:3000/turnos/update/${turnoSeleccionado.id_ticket}`, {
                 method: 'PUT',
                 headers: {
                     "Content-Type": "application/json",
                     "x-api-key": API_KEY
                 },
-                body: JSON.stringify({ status: nuevoEstado })
+                body: JSON.stringify({ status: dbStatus })
             });
 
             const result = await res.json();
 
             if (result.ok) {
+                // Guardar el valor en formato DB internamente; la UI usará getEstadoMostrar para mostrarlo legible
                 setTurnos(turnos.map(t =>
                     t.id_ticket === turnoSeleccionado.id_ticket
-                        ? { ...t, status: nuevoEstado }
+                        ? { ...t, status: dbStatus }
                         : t
                 ));
 
-                setTurnoSeleccionado({ ...turnoSeleccionado, status: nuevoEstado });
+                setTurnoSeleccionado({ ...turnoSeleccionado, status: dbStatus });
 
                 setTimeout(() => {
                     setModalAbierto(false);
@@ -109,9 +115,9 @@ function GestionTurnos() {
 
     // Función para obtener la clase CSS del estado
     const getEstadoClass = (status) => {
-        const statusLower = status.toLowerCase().trim();
+        const statusLower = (status || '').toString().toLowerCase().trim();
         if (statusLower === "pendiente") return "pendiente";
-        if (statusLower === "en proceso" || statusLower === "en_proceso") return "en-proceso";
+        if (statusLower === "en proceso" || statusLower === "en_proceso") return "en_proceso";
         if (statusLower === "finalizado") return "finalizado";
         if (statusLower === "cancelado") return "cancelado";
         return "";
@@ -136,14 +142,19 @@ function GestionTurnos() {
 
     // Mapear estados para mostrar
     const getEstadoMostrar = (estado) => {
-        const estados = {
+        const key = (estado || '').toString().toLowerCase().replace(/_/g, ' ').trim();
+        const map = {
             'pendiente': 'Pendiente',
-            'en_proceso': 'En Proceso',
             'en proceso': 'En Proceso',
             'finalizado': 'Finalizado',
             'cancelado': 'Cancelado'
         };
-        return estados[estado.toLowerCase()] || estado;
+        return map[key] || (estado || '');
+    };
+
+    // Convierte texto mostrado (Ej. 'En Proceso') al valor que usa la DB (ej. 'en_proceso')
+    const displayToDb = (display) => {
+        return (display || '').toString().toLowerCase().replace(/ /g, '_').trim();
     };
 
     useEffect(() => {
@@ -152,6 +163,7 @@ function GestionTurnos() {
 
     // CONTADORES DE ESTADOS
     const normalize = s => s?.toLowerCase().trim() ?? "";
+    const normalizeExt = s => s?.toString().toLowerCase().replace(/_/g, ' ').trim() ?? "";
 
     const pendientes = turnos.filter(t => normalize(t.status) === "pendiente").length;
     const proceso = turnos.filter(t => normalize(t.status) === "en proceso" || normalize(t.status) === "en_proceso").length;
@@ -165,14 +177,16 @@ function GestionTurnos() {
     const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
 
     const turnosFiltrados = turnos.filter(t => {
-        // ESTADO
+        // ESTADO (normalizamos underscores y espacios)
         if (filtroEstado !== "Todos") {
-            if (t.status.toLowerCase() !== filtroEstado.toLowerCase()) return false;
+            if (normalizeExt(t.status) !== normalizeExt(filtroEstado)) return false;
         }
 
-        // SERVICIO
+        // SERVICIO (buscamos por inclusión en la descripción)
         if (filtroServicio !== "Todos los servicios") {
-            if (t.description?.toLowerCase() !== filtroServicio.toLowerCase()) return false;
+            const servicio = filtroServicio.toLowerCase();
+            const descripcion = (t.description || "").toLowerCase();
+            if (!descripcion.includes(servicio)) return false;
         }
 
         // FECHA
@@ -188,13 +202,29 @@ function GestionTurnos() {
             case "Este mes":
                 if (fechaTurno < inicioMes) return false;
                 break;
+            case "Personalizado":
+                if (filtroDesde) {
+                    const desde = new Date(filtroDesde);
+                    desde.setHours(0,0,0,0);
+                    const f = new Date(fechaTurno);
+                    f.setHours(0,0,0,0);
+                    if (f < desde) return false;
+                }
+                if (filtroHasta) {
+                    const hasta = new Date(filtroHasta);
+                    hasta.setHours(23,59,59,999);
+                    const f = new Date(fechaTurno);
+                    if (f > hasta) return false;
+                }
+                break;
         }
 
         // BÚSQUEDA
-        const search = busqueda.toLowerCase();
+        const search = (busqueda || "").toLowerCase().trim();
         if (search) {
+            const desc = (t.description || "").toLowerCase();
             if (
-                !t.description.toLowerCase().includes(search) &&
+                !desc.includes(search) &&
                 !String(t.id_user).includes(search) &&
                 !String(t.id_ticket).includes(search)
             ) return false;
@@ -256,6 +286,16 @@ function GestionTurnos() {
 
             {/* Filters */}
             <div className={styles.filtersBar}>
+                <div className={styles.filterGroup} style={{flex: '1 1 200px'}}>
+                    <label className={styles.filterLabel}>🔎 Buscar</label>
+                    <input
+                        type="text"
+                        className={styles.searchInput}
+                        placeholder="Buscar por ID, cliente o descripción..."
+                        value={busqueda}
+                        onChange={(e) => setBusqueda(e.target.value)}
+                    />
+                </div>
                 <div className={styles.filterGroup}>
                     <label className={styles.filterLabel}>📊 Estado</label>
                     <select
@@ -298,6 +338,12 @@ function GestionTurnos() {
                         <option>Este mes</option>
                         <option>Personalizado</option>
                     </select>
+                    {filtroFecha === 'Personalizado' && (
+                        <div style={{marginTop: '8px', display: 'flex', gap: '8px'}}>
+                            <input type="date" className={styles.filterSelect} value={filtroDesde} onChange={(e) => setFiltroDesde(e.target.value)} />
+                            <input type="date" className={styles.filterSelect} value={filtroHasta} onChange={(e) => setFiltroHasta(e.target.value)} />
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -331,8 +377,8 @@ function GestionTurnos() {
                                         <td>{new Date(t.deliveryTime).toLocaleTimeString()}</td>
                                         <td>
                                             <span className={`${styles.statusBadge} ${styles[getEstadoClass(t.status)]}`}>
-                                                {t.status}
-                                            </span>
+                                                    {getEstadoMostrar(t.status)}
+                                                </span>
                                         </td>
                                         <td>
                                             <div className={styles.actionButtons}>
@@ -372,7 +418,7 @@ function GestionTurnos() {
                                     </div>
                                 </div>
                                 <span className={`${styles.statusBadge} ${styles[getEstadoClass(t.status)]}`}>
-                                    {t.status}
+                                    {getEstadoMostrar(t.status)}
                                 </span>
                             </div>
 
@@ -422,7 +468,7 @@ function GestionTurnos() {
                                 <p><strong>Servicio:</strong> {turnoSeleccionado.description}</p>
                                 <p><strong>Estado actual:</strong>
                                     <span className={`${styles.statusBadge} ${styles[getEstadoClass(turnoSeleccionado.status)]}`}>
-                                        {turnoSeleccionado.status}
+                                        {getEstadoMostrar(turnoSeleccionado.status)}
                                     </span>
                                 </p>
                             </div>
@@ -431,7 +477,7 @@ function GestionTurnos() {
                                 <button
                                     className={`${styles.estadoBtn} ${styles.estadoPendiente}`}
                                     onClick={() => handleCambiarEstado('Pendiente')}
-                                    disabled={turnoSeleccionado.status === 'Pendiente'}
+                                    disabled={getEstadoMostrar(turnoSeleccionado.status) === 'Pendiente'}
                                 >
                                     <span className={styles.estadoIcon}>⏳</span>
                                     <span className={styles.estadoTexto}>Pendiente</span>
@@ -440,7 +486,7 @@ function GestionTurnos() {
                                 <button
                                     className={`${styles.estadoBtn} ${styles.estadoProceso}`}
                                     onClick={() => handleCambiarEstado('En Proceso')}
-                                    disabled={turnoSeleccionado.status === 'En Proceso'}
+                                    disabled={getEstadoMostrar(turnoSeleccionado.status) === 'En Proceso'}
                                 >
                                     <span className={styles.estadoIcon}>🔧</span>
                                     <span className={styles.estadoTexto}>En Proceso</span>
@@ -449,7 +495,7 @@ function GestionTurnos() {
                                 <button
                                     className={`${styles.estadoBtn} ${styles.estadoFinalizado}`}
                                     onClick={() => handleCambiarEstado('Finalizado')}
-                                    disabled={turnoSeleccionado.status === 'Finalizado'}
+                                    disabled={getEstadoMostrar(turnoSeleccionado.status) === 'Finalizado'}
                                 >
                                     <span className={styles.estadoIcon}>✓</span>
                                     <span className={styles.estadoTexto}>Finalizado</span>
@@ -458,7 +504,7 @@ function GestionTurnos() {
                                 <button
                                     className={`${styles.estadoBtn} ${styles.estadoCancelado}`}
                                     onClick={() => handleCambiarEstado('Cancelado')}
-                                    disabled={turnoSeleccionado.status === 'Cancelado'}
+                                    disabled={getEstadoMostrar(turnoSeleccionado.status) === 'Cancelado'}
                                 >
                                     <span className={styles.estadoIcon}>✕</span>
                                     <span className={styles.estadoTexto}>Cancelado</span>

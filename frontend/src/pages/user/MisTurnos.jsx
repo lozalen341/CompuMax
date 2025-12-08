@@ -50,13 +50,15 @@ function MisTurnos() {
         try {
             const token = localStorage.getItem('token');
             const API_KEY = import.meta.env.VITE_API_KEY;
-            
-            const response = await fetch(`http://localhost:3000/turnos/delete/${turnoAEliminar.id_ticket}`, {
-                method: 'DELETE',
+            // En vez de eliminar el turno, lo marcamos como 'cancelado' en la base de datos
+            const response = await fetch(`http://localhost:3000/turnos/update/${turnoAEliminar.id_ticket}`, {
+                method: 'PUT',
                 headers: {
+                    'Content-Type': 'application/json',
                     'x-api-key': API_KEY,
                     'Authorization': `Bearer ${token}`
-                }
+                },
+                body: JSON.stringify({ status: 'cancelado' })
             });
 
             if (!response.ok) {
@@ -64,11 +66,8 @@ function MisTurnos() {
                 throw new Error(errorData.error || 'Error al cancelar el turno');
             }
 
-            setMessage({
-                text: 'Turno cancelado correctamente',
-                type: 'success'
-            });
-            
+            setMessage({ text: 'Turno cancelado correctamente', type: 'success' });
+            // Refrescar lista
             await fetchTurnos();
             cerrarModalEliminar();
             
@@ -77,10 +76,7 @@ function MisTurnos() {
             
         } catch (error) {
             console.error('Error al cancelar el turno:', error);
-            setMessage({
-                text: error.message || 'Error al cancelar el turno',
-                type: 'error'
-            });
+            setMessage({ text: error.message || 'Error al cancelar el turno', type: 'error' });
             cerrarModalEliminar();
         }
     };

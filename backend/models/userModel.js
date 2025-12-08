@@ -1,6 +1,20 @@
 const db = require('../config/db')
 
-exports.createUser = async (name, lastname, email, type, password) => {
+exports.createUser = async (name, lastname, email, type, password, phone) => {
+    // Intentar insertar con phone si fue proporcionado; si la columna no existe, caer al query sin phone
+    if (phone !== undefined && phone !== null && phone !== '') {
+        try {
+            const [rows] = await db.query(
+                'INSERT INTO `users` (`id_user`, `name`, `lastname`, `email`, `type`, `password`, `phone`) VALUES (NULL, ?, ?, ?, ?, ?, ?)',
+                [name, lastname, email, type, password, phone]
+            );
+            return rows;
+        } catch (err) {
+            // Si falla (por ejemplo columna 'phone' no existe), intentar sin phone
+            console.warn('Fallo insert con phone, intentando sin phone:', err.message);
+        }
+    }
+
     const [rows] = await db.query(
         'INSERT INTO `users` (`id_user`, `name`, `lastname`, `email`, `type`, `password`) VALUES (NULL, ?, ?, ?, ?, ?)',
         [name, lastname, email, type, password]
