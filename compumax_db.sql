@@ -99,3 +99,7 @@ ALTER TABLE `tickets`
   ADD CONSTRAINT `id_users` FOREIGN KEY (`id_user`) REFERENCES `users` (`id_user`);
 
 COMMIT;
+ 
+/* Migration: add service column to tickets if not present */
+ALTER TABLE `tickets` 
+  ADD COLUMN IF NOT EXISTS `service` varchar(200) DEFAULT '';

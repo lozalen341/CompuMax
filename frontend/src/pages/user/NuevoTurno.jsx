@@ -113,7 +113,8 @@ function NuevoTurno() {
                     dateCreated: dateCreated,
                     deliveryTime: deliveryDateTime,
                     status: "pendiente",
-                    description: `${formData.servicio}: ${formData.descripcion}`
+                    service: formData.servicio,
+                    description: formData.descripcion
                 })
             });
 
