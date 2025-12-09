@@ -1,0 +1,20 @@
+{
+  "name": "compumax",
+  "version": "1.0.0",
+  "description": "<p align=\"center\">\r   <img src=\"CompuMax-blanco.png\" alt=\"CompuMax Logo\" />\r </p>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lozalen341/CompuMax.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lozalen341/CompuMax/issues"
+  },
+  "homepage": "https://github.com/lozalen341/CompuMax#readme"
+}
