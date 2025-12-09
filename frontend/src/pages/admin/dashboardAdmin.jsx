@@ -43,8 +43,8 @@ function DashboardAdmin() {
     };
 
     const pendientesCount = getCountByStatus('pendiente');
-    const enProcesoCount = getCountByStatus('en proceso') + getCountByStatus('en_proceso');
-    const completadosCount = getCountByStatus('completado');
+    const enProcesoCount = getCountByStatus('en proceso') || getCountByStatus('en_proceso');
+    const completadosCount = getCountByStatus('finalizado');
 
     const enProcesoTurnos = turnos.filter(t => normalizeStatus(t.status) === 'en proceso').slice(0, 5);
 
@@ -104,7 +104,7 @@ function DashboardAdmin() {
                     </div>
                     <div className={styles.statContent}>
                         <h3 className={styles.statNumber}>{isLoading ? '—' : completadosCount}</h3>
-                        <p className={styles.statLabel}>Completados</p>
+                        <p className={styles.statLabel}>Finalizados</p>
                         <span className={styles.statTrend}>→ Este mes</span>
                     </div>
                 </div>
