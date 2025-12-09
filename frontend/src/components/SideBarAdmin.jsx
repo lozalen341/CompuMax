@@ -72,6 +72,7 @@ function SideBar() {
                 <nav className="sidebarNav">
                     <NavLink
                         to="/admin"
+                        end
                         className={({ isActive }) => "navItem" + (isActive ? " active" : "")}
                         onClick={closeSidebar}
                     >
@@ -81,7 +82,6 @@ function SideBar() {
 
                     <NavLink
                         to="/admin/turnos"
-                        end
                         className={({ isActive }) => "navItem" + (isActive ? " active" : "")}
                         onClick={closeSidebar}
                     >

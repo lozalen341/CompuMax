@@ -141,7 +141,7 @@
 .statPending::before { background: var(--status-pending); }
 .statProcess::before { background: var(--status-process); }
 .statCompleted::before { background: var(--status-completed); }
-.statRevenue::before { background: linear-gradient(90deg, #10B981, #059669); }
+.statRevenue::before { background: #ff391e}
 
 .statIcon {
     width: 55px;
@@ -155,9 +155,9 @@
 }
 
 .statPending .statIcon { background: rgba(245, 158, 11, 0.15); }
-.statProcess .statIcon { background: rgba(59, 130, 246, 0.15); }
+.statProcess .statIcon { background: rgba(14, 106, 255, 0.15); }
 .statCompleted .statIcon { background: rgba(16, 185, 129, 0.15); }
-.statRevenue .statIcon { background: rgba(16, 185, 129, 0.15); }
+.statRevenue .statIcon { background: rgba(255, 18, 18, 0.15); }
 
 .statContent {
     flex: 1;

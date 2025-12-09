@@ -328,7 +328,7 @@ function GestionTurnos() {
                 </div>
 
                 <div className={`${styles.statCard} ${styles.statRevenue}`}>
-                    <div className={styles.statIcon}>💰</div>
+                    <div className={styles.statIcon}>❌</div>
                     <div className={styles.statContent}>
                         <h3>{cancelados}</h3>
                         <p>Cancelados</p>

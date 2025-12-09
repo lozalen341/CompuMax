@@ -73,6 +73,7 @@ function SideBar() {
                 <nav className="sidebarNav">
                     <NavLink
                         to="/user"
+                        end
                         className={({ isActive }) => "navItem" + (isActive ? " active" : "")}
                         onClick={closeSidebar}
                     >
