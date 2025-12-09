@@ -11,6 +11,7 @@ function Register() {
 
     const [name, setName] = useState("");
     const [lastname, setLastname] = useState("");
+    const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [type] = useState("user"); // default user
@@ -26,7 +27,7 @@ function Register() {
                     "Content-Type": "application/json",
                     "x-api-key": API_KEY
                 },
-                body: JSON.stringify({ name, lastname, email, password, type })
+                body: JSON.stringify({ name, lastname, email, password, type, phone })
             });
 
             const result = await res.json();
@@ -79,6 +80,17 @@ function Register() {
                             {msg}
                         </div>
                     )}
+                    <div className={styles.formGroup}>
+                        <label className={styles.formLabel} htmlFor="phone">Teléfono</label>
+                        <input
+                            type="tel"
+                            id="phone"
+                            className={styles.formInput}
+                            placeholder="011-1234-5678"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                        />
+                    </div>
                     <form onSubmit={handleRegister}>
                         <div className={styles.formRow}>
                             <div className={styles.formGroup}>

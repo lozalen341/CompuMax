@@ -14,7 +14,7 @@ function SideBar() {
             const API_KEY = import.meta.env.VITE_API_KEY;
             const token = localStorage.getItem('token');
             
-            const response = await fetch('http://localhost:3000/users/logout', {
+            const response = await fetch('http://localhost:3000/user/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -22,9 +22,14 @@ function SideBar() {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            let result = null;
+            try {
+                result = await response.json();
+            } catch (err) {
+                // respuesta no JSON (p. ej. 404 HTML), manejar sin romper
+                result = { error: 'Respuesta no JSON del servidor' };
+            }
 
-            const result = await response.json();
-            
             if (response.ok) {
                 // Limpiar el almacenamiento local
                 localStorage.removeItem('token');
@@ -34,7 +39,7 @@ function SideBar() {
                 // Redirigir a la página de inicio de sesión
                 navigate('/login');
             } else {
-                console.error('Error al cerrar sesión:', result.error);
+                console.error('Error al cerrar sesión:', result?.error || 'Error desconocido');
             }
         } catch (error) {
             console.error('Error al cerrar sesión:', error);

@@ -52,7 +52,6 @@ function DashboardUser() {
     const pendientesCount = getCountByStatus('pendiente');
     const enProcesoCount = getCountByStatus('en proceso');
     const completadosCount = getCountByStatus('completado');
-    const totalTurnos = turnos.length;
 
     // Get next 3 upcoming non-completed turnos
     const getUpcomingTurnos = () => {
@@ -125,17 +124,6 @@ function DashboardUser() {
                         <h3 className={styles.statNumber}>{completadosCount}</h3>
                         <p className={styles.statLabel}>Completados</p>
                         <span className={styles.statTrend}>→ Este mes</span>
-                    </div>
-                </div>
-
-                <div className={styles.statCard}>
-                    <div className={styles.statIcon} style={{ background: "rgba(139, 92, 246, 0.15)" }}>
-                        📋
-                    </div>
-                    <div className={styles.statContent}>
-                        <h3 className={styles.statNumber}>{totalTurnos}</h3>
-                        <p className={styles.statLabel}>Total de Turnos</p>
-                        <span className={styles.statTrend}>→ Histórico</span>
                     </div>
                 </div>
             </div>
