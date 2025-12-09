@@ -5,7 +5,7 @@ function GestionTurnos() {
     const [turnos, setTurnos] = useState([]);
     const [filtroEstado, setFiltroEstado] = useState("Todos");
     const [filtroServicio, setFiltroServicio] = useState("Todos los servicios");
-    const [filtroFecha, setFiltroFecha] = useState("Hoy");
+    const [filtroFecha, setFiltroFecha] = useState("Todos");
     const [filtroDesde, setFiltroDesde] = useState("");
     const [filtroHasta, setFiltroHasta] = useState("");
     const [busqueda, setBusqueda] = useState("");
@@ -27,6 +27,7 @@ function GestionTurnos() {
             });
 
             const result = await res.json();
+            console.log(result);
             setTurnos(result.turno);
         } catch (error) {
             console.log(error);
@@ -152,6 +153,42 @@ function GestionTurnos() {
         return map[key] || (estado || '');
     };
 
+    // Extraer service y description cuando vienen juntos en un solo campo
+    const parseServiceAndDescription = (t) => {
+        // Si la API ya devuelve 'service' por separado, úsalo
+        if (t.service) {
+            return { service: t.service, description: t.description || "" };
+        }
+
+        const raw = (t.description || "").toString();
+        // Si el formato es 'service: description', separar por el primer ':'
+        const idx = raw.indexOf(":");
+        if (idx !== -1) {
+            const service = raw.slice(0, idx).replace(/-/g, ' ').trim();
+            const desc = raw.slice(idx + 1).trim();
+            return { service, description: desc };
+        }
+
+        // Si no hay separador, asumir todo como description
+        return { service: "", description: raw };
+    };
+
+    // Mapeo de IDs de servicio (como se guardan en NuevoTurno) a títulos legibles
+    const serviceIdToTitle = {
+        'reparacion-pc': 'Reparación de PC',
+        'dispositivos-moviles': 'Dispositivos Móviles',
+        'recuperacion-datos': 'Recuperación de Datos',
+        'mantenimiento': 'Mantenimiento',
+        'instalacion-software': 'Instalación de Software',
+        'impresoras': 'Impresoras'
+    };
+
+    const mapServiceToTitle = (serviceValue) => {
+        if (!serviceValue) return '';
+        const key = serviceValue.toString().trim();
+        return serviceIdToTitle[key] || serviceValue;
+    };
+
     // Convierte texto mostrado (Ej. 'En Proceso') al valor que usa la DB (ej. 'en_proceso')
     const displayToDb = (display) => {
         return (display || '').toString().toLowerCase().replace(/ /g, '_').trim();
@@ -182,25 +219,39 @@ function GestionTurnos() {
             if (normalizeExt(t.status) !== normalizeExt(filtroEstado)) return false;
         }
 
-        // SERVICIO (buscamos por inclusión en la descripción)
-        if (filtroServicio !== "Todos los servicios") {
-            const servicio = filtroServicio.toLowerCase();
-            const descripcion = (t.description || "").toLowerCase();
-            if (!descripcion.includes(servicio)) return false;
+        // SERVICIO: filtrar por tipo de servicio (usa parsed.service si existe)
+        if (filtroServicio && filtroServicio !== "Todos los servicios") {
+            const parsed = parseServiceAndDescription(t);
+            const strip = (s) => (s || '').toString()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[_-]/g, ' ')
+                .toLowerCase()
+                .trim();
+
+            const sel = strip(filtroServicio);
+            const serv = strip(mapServiceToTitle(parsed.service) || parsed.description || '');
+            const desc = strip(parsed.description || '');
+
+            if (!serv.includes(sel) && !desc.includes(sel)) return false;
         }
+
+
 
         // FECHA
         const fechaTurno = new Date(t.dateCreated);
 
         switch (filtroFecha) {
+            case "Todos":
+                // No filtrar por fecha
+                break;
             case "Hoy":
-                if (fechaTurno.toDateString() !== hoy.toDateString()) return false;
+                // Para 'Hoy' usamos la fecha del turno (deliveryTime), no la fecha de creación
+                const fechaDelivery = new Date(t.deliveryTime);
+                if (fechaDelivery.toDateString() !== hoy.toDateString()) return false;
                 break;
             case "Esta semana":
                 if (fechaTurno < inicioSemana) return false;
-                break;
-            case "Este mes":
-                if (fechaTurno < inicioMes) return false;
                 break;
             case "Personalizado":
                 if (filtroDesde) {
@@ -216,6 +267,8 @@ function GestionTurnos() {
                     const f = new Date(fechaTurno);
                     if (f > hasta) return false;
                 }
+                break;
+            default:
                 break;
         }
 
@@ -321,8 +374,10 @@ function GestionTurnos() {
                         <option>Todos los servicios</option>
                         <option>Reparación de PC</option>
                         <option>Dispositivos Móviles</option>
-                        <option>Mantenimiento</option>
                         <option>Recuperación de Datos</option>
+                        <option>Mantenimiento</option>
+                        <option>Instalación de Software</option>
+                        <option>Impresoras</option>
                     </select>
                 </div>
 
@@ -333,9 +388,9 @@ function GestionTurnos() {
                         value={filtroFecha}
                         onChange={(e) => setFiltroFecha(e.target.value)}
                     >
+                        <option>Todos</option>
                         <option>Hoy</option>
                         <option>Esta semana</option>
-                        <option>Este mes</option>
                         <option>Personalizado</option>
                     </select>
                     {filtroFecha === 'Personalizado' && (
@@ -361,6 +416,7 @@ function GestionTurnos() {
                                     <th>ID</th>
                                     <th>ID del cliente</th>
                                     <th>Servicio</th>
+                                    <th>Descripción</th>
                                     <th>Fecha</th>
                                     <th>Hora</th>
                                     <th>Estado</th>
@@ -368,11 +424,14 @@ function GestionTurnos() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {turnosFiltrados.map((t) => (
+                                {turnosFiltrados.map((t) => {
+                                    const parsed = parseServiceAndDescription(t);
+                                    return (
                                     <tr key={t.id_ticket}>
                                         <td>{t.id_ticket}</td>
                                         <td>{t.id_user}</td>
-                                        <td>{t.description}</td>
+                                        <td>{mapServiceToTitle(parsed.service) || parsed.description}</td>
+                                        <td>{parsed.description}</td>
                                         <td>{new Date(t.dateCreated).toLocaleDateString()}</td>
                                         <td>{new Date(t.deliveryTime).toLocaleTimeString()}</td>
                                         <td>
@@ -399,7 +458,8 @@ function GestionTurnos() {
                                             </div>
                                         </td>
                                     </tr>
-                                ))}
+                                    )
+                                })}
                             </tbody>
                         </table>
                     </div>
@@ -407,14 +467,17 @@ function GestionTurnos() {
 
                 {/* Mobile */}
                 <div className={styles.mobileView}>
-                    {turnosFiltrados.map((t) => (
+                    {turnosFiltrados.map((t) => {
+                        const parsed = parseServiceAndDescription(t);
+                        return (
                         <div key={t.id_ticket} className={styles.turnoCard}>
                             <div className={styles.cardHeader}>
                                 <div className={styles.cardHeaderLeft}>
                                     <div className={styles.avatar}>{t.id_user}</div>
                                     <div className={styles.cardInfo}>
-                                        <h3 className={styles.cardCliente}>{t.description}</h3>
+                                        <h3 className={styles.cardCliente}>{mapServiceToTitle(parsed.service) || parsed.description}</h3>
                                         <span className={styles.cardId}>{t.id_ticket}</span>
+                                        {parsed.description && <div className={styles.cardSubtitle}>{parsed.description}</div>}
                                     </div>
                                 </div>
                                 <span className={`${styles.statusBadge} ${styles[getEstadoClass(t.status)]}`}>
@@ -448,7 +511,8 @@ function GestionTurnos() {
                                 </button>
                             </div>
                         </div>
-                    ))}
+                        )
+                    })}
                 </div>
             </div>
 
@@ -461,11 +525,19 @@ function GestionTurnos() {
                             <button className={styles.modalClose} onClick={cerrarModal}>×</button>
                         </div>
 
-                        <div className={styles.modalBody}>
+                            <div className={styles.modalBody}>
                             <div className={styles.turnoInfo}>
                                 <p><strong>ID Turno:</strong> {turnoSeleccionado.id_ticket}</p>
                                 <p><strong>Cliente:</strong> {turnoSeleccionado.id_user}</p>
-                                <p><strong>Servicio:</strong> {turnoSeleccionado.description}</p>
+                                {(() => {
+                                    const parsed = parseServiceAndDescription(turnoSeleccionado);
+                                    return (
+                                        <>
+                                            <p><strong>Servicio:</strong> {mapServiceToTitle(parsed.service) || turnoSeleccionado.description}</p>
+                                            {parsed.description && <p><strong>Descripción:</strong> {parsed.description}</p>}
+                                        </>
+                                    )
+                                })()}
                                 <p><strong>Estado actual:</strong>
                                     <span className={`${styles.statusBadge} ${styles[getEstadoClass(turnoSeleccionado.status)]}`}>
                                         {getEstadoMostrar(turnoSeleccionado.status)}
@@ -541,7 +613,15 @@ function GestionTurnos() {
                             <div className={styles.turnoInfo}>
                                 <p><strong>ID Turno:</strong> {turnoAEliminar.id_ticket}</p>
                                 <p><strong>Cliente:</strong> {turnoAEliminar.id_user}</p>
-                                <p><strong>Servicio:</strong> {turnoAEliminar.description}</p>
+                                {(() => {
+                                    const parsed = parseServiceAndDescription(turnoAEliminar);
+                                    return (
+                                        <>
+                                            <p><strong>Servicio:</strong> {mapServiceToTitle(parsed.service) || turnoAEliminar.description}</p>
+                                            {parsed.description && <p><strong>Descripción:</strong> {parsed.description}</p>}
+                                        </>
+                                    )
+                                })()}
                                 <p><strong>Fecha:</strong> {formatDate(turnoAEliminar.dateCreated)}</p>
                                 <p><strong>Hora:</strong> {formatTime(turnoAEliminar.deliveryTime)}</p>
                                 <p><strong>Estado:</strong>

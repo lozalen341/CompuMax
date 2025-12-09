@@ -16,11 +16,12 @@ exports.createTurno = async (
     dateCreated,
     deliveryTime,
     status,
+    service,
     description
 ) => {
     const [rows] = await db.query(
-        "INSERT INTO `tickets` (`id_user`, `dateCreated`, `deliveryTime`, `status`, `description`) VALUES (?, ?, ?, ?, ?)",
-        [id_user, dateCreated, deliveryTime, status, description]
+        "INSERT INTO `tickets` (`id_user`, `dateCreated`, `deliveryTime`, `status`, `service`, `description`) VALUES (?, ?, ?, ?, ?, ?)",
+        [id_user, dateCreated, deliveryTime, status, service, description]
     );
     return rows;
 };
@@ -29,7 +30,7 @@ exports.updateTurno = async (id, datos) => {
     const campos = [];
     const params = [];
 
-    const array = ["id_user", "dateCreated", "deliveryTime", "status", "description"];
+    const array = ["id_user", "dateCreated", "deliveryTime", "status", "service", "description"];
 
     for (let i = 0; i < array.length; i++) {
         const element = array[i];

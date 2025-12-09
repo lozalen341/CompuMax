@@ -90,62 +90,81 @@ function GestionUsuarios() {
         setTurnosUsuario([]);
     };
 
-    const handleBanear = async () => {
+    const handleToggleAdmin = async () => {
         if (!usuarioSeleccionado) return;
 
-        // Aquí podrías implementar un endpoint específico para banear
-        // Por ahora, usamos el update para cambiar algún estado
         try {
             const API_KEY = import.meta.env.VITE_API_KEY;
+            const token = localStorage.getItem('token');
+            // Alternar tipo: 0 = admin, 1 = cliente
+            const currentType = Number(usuarioSeleccionado.type);
+            const newType = currentType === 0 ? 1 : 0;
+
+            // Enviar 'admin' o 'user' porque el backend espera esos strings
             const response = await fetch(`http://localhost:3000/user/update/${usuarioSeleccionado.id_user}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "x-api-key": API_KEY
+                    "x-api-key": API_KEY,
+                    "Authorization": token ? `Bearer ${token}` : undefined
                 },
                 body: JSON.stringify({
-                    // Aquí podrías tener un campo "banned" o similar
                     name: usuarioSeleccionado.name,
                     lastname: usuarioSeleccionado.lastname,
                     email: usuarioSeleccionado.email,
-                    type: usuarioSeleccionado.type
+                    type: newType === 0 ? 'admin' : 'user'
                 })
             });
 
-            if (response.ok) {
-                alert(`Usuario ${usuarioSeleccionado.name} baneado`);
-                obtenerUsuarios(); // Recargar lista
+            const data = await response.json().catch(() => ({}));
+
+            if (response.ok && data.user) {
+                const action = newType === 0 ? 'otorgado' : 'revocado';
+                alert(`Rol de admin ${action} a ${data.user.name || usuarioSeleccionado.name}`);
+                // Actualizar la lista con la respuesta del servidor
+                await obtenerUsuarios();
                 cerrarModales();
+            } else {
+                console.error('Error al cambiar rol:', data);
+                alert(data.message || 'No se pudo actualizar el rol del usuario');
             }
         } catch (error) {
-            console.error("Error al banear usuario:", error);
-            alert("Error al banear usuario");
+            console.error('Error al cambiar rol del usuario:', error);
+            alert('Error al cambiar rol del usuario');
         }
     };
 
     const handleEliminar = async () => {
         if (!usuarioSeleccionado) return;
 
-        if (window.confirm(`¿Estás seguro de eliminar a ${usuarioSeleccionado.name} ${usuarioSeleccionado.lastname}?`)) {
-            try {
-                const API_KEY = import.meta.env.VITE_API_KEY;
-                const response = await fetch(`http://localhost:3000/user/delete/${usuarioSeleccionado.id_user}`, {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "x-api-key": API_KEY
-                    }
-                });
+        if (!window.confirm(`¿Estás seguro de eliminar a ${usuarioSeleccionado.name} ${usuarioSeleccionado.lastname}?`)) return;
 
-                if (response.ok) {
-                    alert(`Usuario ${usuarioSeleccionado.name} eliminado`);
-                    obtenerUsuarios(); // Recargar lista
-                    cerrarModales();
+        try {
+            const API_KEY = import.meta.env.VITE_API_KEY;
+            const token = localStorage.getItem('token');
+
+            const response = await fetch(`http://localhost:3000/user/delete/${usuarioSeleccionado.id_user}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": API_KEY,
+                    "Authorization": token ? `Bearer ${token}` : undefined
                 }
-            } catch (error) {
-                console.error("Error al eliminar usuario:", error);
-                alert("Error al eliminar usuario");
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (response.ok) {
+                alert(data.message || `Usuario ${usuarioSeleccionado.name} eliminado`);
+                await obtenerUsuarios(); // Recargar lista
+                cerrarModales();
+            } else {
+                console.error('Error al eliminar usuario:', data);
+                alert(data.message || 'Error al eliminar usuario');
             }
+        } catch (error) {
+            console.error("Error al eliminar usuario:", error);
+            alert("Error al eliminar usuario");
         }
     };
 
@@ -223,8 +242,8 @@ function GestionUsuarios() {
     // ---------------------------
     // CUENTAS Y CÁLCULOS
     // ---------------------------
-    const totalAdmins = usuarios.filter(u => Number(u.type) === 0).length;
-    const totalEmpleados = usuarios.filter(u => Number(u.type) === 1).length;
+    const totalAdmins = usuarios.filter(u => Number(u.type) === 1   ).length;
+    const totalEmpleados = usuarios.filter(u => Number(u.type) === 0).length;
 
     // Calcular estadísticas de turnos
     const turnosCompletados = turnosUsuario.filter(t => t.status === 'completado').length;
@@ -604,15 +623,15 @@ function GestionUsuarios() {
                             </div>
 
                             <div className={styles.actionsGrid}>
-                                <button className={styles.btnBan} onClick={handleBanear}>
-                                    <span className={styles.actionIcon}>🚫</span>
+                                <button className={styles.btnAction} onClick={handleToggleAdmin}>
+                                    <span className={styles.actionIcon}>🛡️</span>
                                     <div className={styles.actionContent}>
-                                        <h4>Banear Usuario</h4>
-                                        <p>Suspender temporalmente el acceso del usuario</p>
+                                        <h4>{Number(usuarioSeleccionado.type) === 0 ? 'Revocar Admin' : 'Dar Admin'}</h4>
+                                        <p>{Number(usuarioSeleccionado.type) === 0 ? 'Quitar privilegios de administrador' : 'Conceder privilegios de administrador'}</p>
                                     </div>
                                 </button>
 
-                                <button className={styles.btnDelete} onClick={handleEliminar}>
+                                <button className={`${styles.btnDelete} ${styles.btnAction}`} onClick={handleEliminar}>
                                     <span className={styles.actionIcon}>🗑️</span>
                                     <div className={styles.actionContent}>
                                         <h4>Eliminar Usuario</h4>

@@ -58,13 +58,26 @@ exports.getAllById = async (req, res) => {
  */
 exports.createTurno = async (req, res) => {
     try {
-        let { id_user, dateCreated, deliveryTime, status, description } = req.body;
+        let { id_user, dateCreated, deliveryTime, status, description, service } = req.body;
+
+        // Si el cliente no manda `service` por separado, intentar parsearlo desde `description`
+        if ((!service || service.toString().trim() === "") && description) {
+            const raw = description.toString();
+            const idx = raw.indexOf(":");
+            if (idx !== -1) {
+                service = raw.slice(0, idx).trim();
+                description = raw.slice(idx + 1).trim();
+            } else {
+                service = "";
+            }
+        }
 
         const create = await Turnos.createTurno(
             id_user,
             dateCreated,
             deliveryTime,
             status,
+            service,
             description
         );
         
@@ -93,6 +106,16 @@ exports.updateTurno = async (req, res) => {
     try {
         const id_ticket = req.params.id;
         const datos = req.body;
+
+        // Si recibimos una descripción combinada, separarla en service+description
+        if (datos.description && (!datos.service || datos.service.toString().trim() === "")) {
+            const raw = datos.description.toString();
+            const idx = raw.indexOf(":");
+            if (idx !== -1) {
+                datos.service = raw.slice(0, idx).trim();
+                datos.description = raw.slice(idx + 1).trim();
+            }
+        }
 
         const update = await Turnos.updateTurno(id_ticket, datos);
         res.json({ ok: true, turno: update });
