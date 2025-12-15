@@ -131,15 +131,15 @@ exports.updateTurno = async (req, res) => {
  * @function deleteTurno
  * @param {Object} req - Objeto de solicitud de Express
  * @param {Object} req.params - Parámetros de la URL
- * @param {string} req.params.id_ticket - ID del turno a eliminar
+ * @param {string} req.params.id_user - ID del turno a eliminar
  * @param {Object} res - Objeto de respuesta de Express
  * @returns {Promise<void>} Respuesta JSON confirmando la eliminación o error
  * @throws {Error} Si hay un error al eliminar el turno de la base de datos
  */
 exports.deleteTurno = async (req, res) => {
     try {
-        const id_ticket = req.params.id_ticket;
-        const deleteTurn = await Turnos.deleteTurno(id_ticket);
+        const id_user = req.params.id_user;
+        const deleteTurn = await Turnos.deleteTurno(id_user);
 
         res.json({ ok: true, turno: deleteTurn });
 

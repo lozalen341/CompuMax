@@ -344,7 +344,7 @@ function GestionTurnos() {
                     <input
                         type="text"
                         className={styles.searchInput}
-                        placeholder="Buscar por ID, cliente o descripción..."
+                        placeholder="Buscar por ID de cliente"
                         value={busqueda}
                         onChange={(e) => setBusqueda(e.target.value)}
                     />

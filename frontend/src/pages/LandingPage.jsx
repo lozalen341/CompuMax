@@ -246,10 +246,8 @@ function LandingPage() {
 
           <div className={styles.footerSection}>
             <h3>Horarios</h3>
-            <p>Lunes a Viernes</p>
-            <p>9:00 - 18:00 hs</p>
-            <p>Sábados</p>
-            <p>9:00 - 13:00 hs</p>
+            <p>Lunes a Lunes</p>
+            <p>9:00 - 17:00 hs</p>
           </div>
         </div>
 

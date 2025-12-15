@@ -48,9 +48,9 @@ exports.updateTurno = async (id, datos) => {
     return rows;
 };
 
-exports.deleteTurno = async (id_ticket) => {
+exports.deleteTurno = async (id_user) => {
     const [rows] = await db.query(
-        "DELETE FROM tickets WHERE id_ticket = ?", [id_ticket]
+        "DELETE FROM tickets WHERE id_user = ?", [id_user]
     );
     return rows;
 };

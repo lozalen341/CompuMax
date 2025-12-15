@@ -232,6 +232,6 @@ router.put('/update/:id', TurnosController.updateTurno)
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete('/delete/:id_ticket', TurnosController.deleteTurno)
+router.delete('/delete/:id_user', TurnosController.deleteTurno)
 
 module.exports = router

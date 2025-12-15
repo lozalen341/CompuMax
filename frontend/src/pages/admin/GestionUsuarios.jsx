@@ -143,6 +143,25 @@ function GestionUsuarios() {
             const API_KEY = import.meta.env.VITE_API_KEY;
             const token = localStorage.getItem('token');
 
+            // Eliminar los turnos del usuario primero
+            const eliminarTurnosResponse = await fetch(`http://localhost:3000/turnos/delete/${usuarioSeleccionado.id_user}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": API_KEY,
+                    "Authorization": token ? `Bearer ${token}` : undefined
+                }
+            });
+
+            const eliminarTurnosData = await eliminarTurnosResponse.json().catch(() => ({}));
+
+            if (!eliminarTurnosResponse.ok) {
+                console.error("Error al eliminar turnos:", eliminarTurnosData);
+                alert("No se pudieron eliminar los turnos del usuario");
+                return; // Si no se pudo eliminar los turnos, no eliminar al usuario
+            }
+
+            // eliminar al usuario
             const response = await fetch(`http://localhost:3000/user/delete/${usuarioSeleccionado.id_user}`, {
                 method: "DELETE",
                 headers: {
@@ -168,9 +187,7 @@ function GestionUsuarios() {
         }
     };
 
-    // ---------------------------
     // FILTRADO Y BÚSQUEDA
-    // ---------------------------
     const usuariosFiltrados = usuarios
         .filter((u) => {
             const tipo = Number(u.type);
@@ -242,7 +259,7 @@ function GestionUsuarios() {
     // ---------------------------
     // CUENTAS Y CÁLCULOS
     // ---------------------------
-    const totalAdmins = usuarios.filter(u => Number(u.type) === 1   ).length;
+    const totalAdmins = usuarios.filter(u => Number(u.type) === 1).length;
     const totalEmpleados = usuarios.filter(u => Number(u.type) === 0).length;
 
     // Calcular estadísticas de turnos
